@@ -27,8 +27,9 @@ file structure of Boost.Math. These new files contain implementations
 of generalized hypergeometric functions in different parameter ranges.
 
 This project has a strong research character. The effort of finding
-practical methods for computating hypergeometric functions is just
-as large (or larger) than the resulting implementations in code.
+practical methods for computing hypergeometric functions is just
+as significant (or even more so) than the effort required for producing
+corresponding implementations in code.
 
 Upon successful completion of this project, some or all of the
 candidate files in this project may potentially be merged to and/or
