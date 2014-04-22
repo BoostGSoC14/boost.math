@@ -1,6 +1,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright 2014 Not yet selected
+//  Copyright 2014 Anton Bikineev
 //  Copyright 2014 Christopher Kormanyos
 //  Copyright 2014 John Maddock
 //  Copyright 2014 Paul Bristow
