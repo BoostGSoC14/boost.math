@@ -24,15 +24,17 @@ Project details
 
 This project is intended to add several new files to the existing
 file structure of Boost.Math. These new files contain implementations
-generalized hypergeometric functions.
+of generalized hypergeometric functions in different parameter ranges.
 
-This project has a strong research character and the effort of
-finding practical computational methods will be just as large
-(or larger) than the resulting implementations in code.
+This project has a strong research character. The effort of finding
+practical methods for computating hypergeometric functions is just
+as large (or larger) than the resulting implementations in code.
 
 Upon successful completion of this project, some or all of the
 candidate files in this project may potentially be merged to and/or
 included in Boost.Math.
+
+The computational methods found should be documented.
 
 --------------------------------------------------------
 Using this project with Boost
