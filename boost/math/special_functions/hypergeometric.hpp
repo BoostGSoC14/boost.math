@@ -11,7 +11,9 @@
 #ifndef _BOOST_HYPERGEOMETRIC_2014_04_07_HPP_
   #define _BOOST_HYPERGEOMETRIC_2014_04_07_HPP_
 
-  namespace boost { namespace math { namespace detail
+  #include <boost/math/special_functions/detail/hypergeometric_series.hpp>
+
+  namespace boost { namespace math { namespace detail {
 
   template <class T, class Policy>
   inline T hypergeometric_0f1_imp(T b, T z, const Policy& pol)
@@ -19,7 +21,7 @@
     // some special cases
     // ...
 
-    return T();
+    return detail::hypergeometric_0f1_generic_series(b, z, pol);
   }
 
   template <class T, class Policy>
@@ -28,7 +30,7 @@
     // some special cases
     // ...
 
-    return T();
+    return detail::hypergeometric_1f0_generic_series(a, z, pol);
   }
 
   template <class T, class Policy>
@@ -37,7 +39,7 @@
     // some special cases
     // ...
 
-    return T();
+    return detail::hypergeometric_1f1_generic_series(a, b, z, pol);
   }
 
   template <class T, class Policy>
@@ -46,7 +48,7 @@
     // some special cases
     // ...
 
-    return T();
+    return detail::hypergeometric_1f2_generic_series(a, b1, b2, z, pol);
   }
 
   template <class T, class Policy>
@@ -55,7 +57,7 @@
     // some special cases
     // ...
 
-    return T();
+    return detail::hypergeometric_2f1_generic_series(a1, a2, b, z, pol);
   }
 
   } // namespace detail
