@@ -9,13 +9,15 @@
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <algorithm>
+#include <array>
 #include <functional>
-#include <initializer_list>
 #include <iomanip>
 #include <iostream>
 #include <numeric>
 #include <vector>
 
+#include <boost/math/constants/constants.hpp>
+#include <boost/math/tools/precision.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 
 template <class T,
@@ -47,19 +49,21 @@ inline T hypergeometric_pfq_imp(forward_iterator_a_type coefficients_a_begin,
   T pochhammer_sequence_a = std::accumulate(ap.begin(), ap.end(), my_one, std::multiplies<T>());
   T pochhammer_sequence_b = std::accumulate(bp.begin(), bp.end(), my_one, std::multiplies<T>());
 
-  // TBD: Which algebraic order is better here for overflow / accuracy concerns?
-  // Should we use?
-  // (an * (x^n / n!)) / bn
-  // Or rather use?
-  // (an / bn) * (x^n / n!)
-  T hypergeometric_pfq_result = my_one + ((pochhammer_sequence_a * x_pow_n_div_n_fact) / pochhammer_sequence_b);
+  // Calculate the first term in the Taylor series expansion.
+  // Use either: (an * (x^n / n!)) / bn
+  // or else use: (an / bn) * (x^n / n!)
+  // based on whether or not (x^n / n!) > 1.
+  const T first_term = ((x_pow_n_div_n_fact > 1)
+                         ? T((pochhammer_sequence_a / pochhammer_sequence_b) * x_pow_n_div_n_fact)
+                         : T((pochhammer_sequence_a * x_pow_n_div_n_fact) / pochhammer_sequence_b));
+
+  T hypergeometric_pfq_result = my_one + first_term;
 
   int n;
 
-  // This is the maximum number of iterations allowed.
-  // TBD: Should this upper limit be scaled according to the number
-  // of digits in the type T?
-  const int max_iteration = 10000;
+  // Calculate the maximum number of iterations allowed.
+  // Here we use an expression similar to (std::numeric_limits<T>::digits10 * 10).
+  const int max_iteration = static_cast<int>(static_cast<float>(boost::math::tools::digits<T>()) * 3.01F);
 
   for(n = 2; n < max_iteration; ++n)
   {
@@ -76,19 +80,19 @@ inline T hypergeometric_pfq_imp(forward_iterator_a_type coefficients_a_begin,
     pochhammer_sequence_a *= std::accumulate(ap.begin(), ap.end(), my_one, std::multiplies<T>());
     pochhammer_sequence_b *= std::accumulate(bp.begin(), bp.end(), my_one, std::multiplies<T>());
 
-    // TBD: Which algebraic order is better here for overflow / accuracy concerns?
-    // Should we use?
-    // (an * (x^n / n!)) / bn
-    // Or rather use?
-    // (an / bn) * (x^n / n!)
-    const T next_term = (pochhammer_sequence_a * x_pow_n_div_n_fact) / pochhammer_sequence_b;
+    // Calculate the next term in the Taylor series expansion.
+    // Use either: (an * (x^n / n!)) / bn
+    // or else use: (an / bn) * (x^n / n!)
+    // based on whether or not (x^n / n!) > 1.
+    const T next_term = ((x_pow_n_div_n_fact > 1)
+                          ? T((pochhammer_sequence_a / pochhammer_sequence_b) * x_pow_n_div_n_fact)
+                          : T((pochhammer_sequence_a * x_pow_n_div_n_fact) / pochhammer_sequence_b));
 
     using std::fabs;
 
-    // TBD: Should we use more clever limiting here based on the digits in the type T?
-    // TBD: Use boost:tools::max_value or something like that here instead of
-    // numeric_limits (real-concept has no limits).
-    if((n > 10) && fabs(next_term) < std::numeric_limits<T>::epsilon())
+    // TBD: Should we use a more clever limiting here (other than n > 10)
+    // based on the digits in the type T?
+    if((n > 10) && (fabs(next_term) < boost::math::tools::epsilon<T>()))
     {
       break;
     }
@@ -96,9 +100,16 @@ inline T hypergeometric_pfq_imp(forward_iterator_a_type coefficients_a_begin,
     hypergeometric_pfq_result += next_term;
   }
 
-  // TBD: Use boost:tools::max_value or something like that here instead of
-  // numeric_limits (real-concept has no limits).
-  return ((n < max_iteration) ? hypergeometric_pfq_result : std::numeric_limits<T>::quiet_NaN());
+  if(n < max_iteration)
+  {
+    return hypergeometric_pfq_result;
+  }
+  else
+  {
+    // TBD: Do we need to throw an exception here.
+    // TBD: Is T() the right return value here?
+    return T();
+  }
 }
 
 namespace
@@ -109,16 +120,18 @@ namespace
 
 int main()
 {
-  const std::vector<float_type> an( { float_type(1) / 2, float_type(1) / 3, float_type(1) / 4, float_type(1) / 5, } );
-  const std::vector<float_type> bm( { float_type(2) / 3, float_type(2) / 4, float_type(2) / 5, float_type(2) / 6, float_type(2) / 7 } );
+  const std::array<float_type, 4U> an = { float_type(1) / 2, float_type(1) / 3, float_type(1) / 4, float_type(1) / 5, };
+  const std::array<float_type, 5U> bm = { float_type(2) / 3, float_type(2) / 4, float_type(2) / 5, float_type(2) / 6, float_type(2) / 7 };
 
-  const float_type x = float_type(1) / 7;
-
-  const float_type h = hypergeometric_pfq_imp(an.begin(), an.end(), bm.begin(), bm.end(), x);
+  const float_type h = hypergeometric_pfq_imp(an.begin(),
+                                              an.end(),
+                                              bm.begin(),
+                                              bm.end(),
+                                              boost::math::constants::euler<float_type>());
 
   // Here is a control value from Wolfram's Alpha or Mathematica(R).
-  // N[HypergeometricPFQ[{1/2, 1/3, 1/4, 1/5}, {2/3, 2/4, 2/5, 2/6, 2/7}, 1/7], 100]
-  // 1.097152657057488780105930458245903202876825351898026852284800644895088124044818091921532757454387577
+  // N[HypergeometricPFQ[{1/2, 1/3, 1/4, 1/5}, {2/3, 2/4, 2/5, 2/6, 2/7}, EulerGamma], 100]
+  // 1.437152091623117098817180937046270756251132185487659323159061684966332133966272470711486705986290248
 
   std::cout << std::setprecision(std::numeric_limits<float_type>::digits10)
             << h
