@@ -197,6 +197,6 @@
     return detail::sum_pfq_series(s, pol);
   }
 
-  }}} // namespaces
+  } } } // namespaces
 
 #endif // BOOST_MATH_HYPERGEOMETRIC_SERIES_HPP
