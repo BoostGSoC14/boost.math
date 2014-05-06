@@ -73,8 +73,7 @@
     BOOST_MATH_STD_USING
     static const char* const function = "boost::math::hypergeometric_1f1_asym_series<%1%>(%1%,%1%,%1%)";
 
-    const T prefix_a = ((exp(z) / boost::math::tgamma(a, pol)) *
-        boost::math::tgamma(b, pol)) * pow(z, (a - b));
+    const T prefix_a = (exp(z) * boost::math::tgamma_ratio(b, a, pol)) * pow(z, (a - b));
     hypergeometric_1f1_asym_series_term_a<T, Policy> s_a(a, b, z);
     boost::uintmax_t max_iter = policies::get_max_series_iterations<Policy>();
 #if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x582))
