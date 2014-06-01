@@ -85,7 +85,7 @@
     policies::check_series_iterations<T>(function, max_iter, pol);
     result_a *= prefix_a;
 
-    const T prefix_b = boost::math::cos_pi(a) /
+    const T prefix_b = boost::math::cos_pi(a, pol) /
         (boost::math::tgamma((b - a), pol) * pow(z, a));
     hypergeometric_1f1_asym_series_term_b<T, Policy> s_b(a, b, z);
     max_iter = policies::get_max_series_iterations<Policy>();
