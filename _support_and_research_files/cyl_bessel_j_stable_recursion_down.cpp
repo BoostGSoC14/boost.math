@@ -17,15 +17,16 @@ T cyl_bessel_j_stable_recursion_down(const T& v,
                                      std::deque<T>* const cyl_bessel_j_results = static_cast<std::deque<T>* const>(0U))
 {
   using std::fabs;
-  using std::modf;
+  using std::floor;
   using std::pow;
 
   // Use recursion and normalization with a Neumann sum.
 
-  T n;
-  const T v_frac = modf(v, &n);
+  const T n      = floor(v);
+  const T v_frac = v - n;
 
   // TBD: Calculate the upper bound of the recursion dynamically.
+  // Use 14 for 15-digit double, and use 56 for cpp_dec_float_100.
   const int upper_bound_of_recursion = 14;
 
   int k                   = upper_bound_of_recursion / 2;
