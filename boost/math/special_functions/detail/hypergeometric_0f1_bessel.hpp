@@ -20,7 +20,7 @@
 
     const bool is_z_nonpositive = z <= 0;
 
-    const T sqrt_z = is_z_nonpositive ? sqrt(-z) : sqrt(z);
+    const T sqrt_z = is_z_nonpositive ? T(sqrt(-z)) : T(sqrt(z));
     const T sqrt_z_pow_b = pow(sqrt_z, b);
     const T bessel_mult = is_z_nonpositive ?
       boost::math::cyl_bessel_j(b - 1, 2 * sqrt_z, pol) :

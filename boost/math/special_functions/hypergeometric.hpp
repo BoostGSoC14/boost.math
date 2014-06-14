@@ -12,23 +12,41 @@
   #define _BOOST_HYPERGEOMETRIC_2014_04_07_HPP_
 
   #include <boost/math/special_functions/detail/hypergeometric_series.hpp>
+  #include <boost/math/special_functions/detail/hypergeometric_0f1_bessel.hpp>
 
   namespace boost { namespace math { namespace detail {
 
   template <class T, class Policy>
   inline T hypergeometric_0f1_imp(T b, T z, const Policy& pol)
   {
-    // some special cases
-    // ...
+    BOOST_MATH_STD_USING
 
+    // some special cases
+    if (z == 0)
+      return 1;
+
+    if (b <= 0 && b == floor(b))
+      return policies::raise_pole_error<T>(
+        "boost::math::hypergeometric_0f1<%1%,%1%>(%1%, %1%)",
+        "Evaluation of 0f1 with nonpositive integer b = %1%.", b, pol);
+
+    // evaluation through Taylor series looks
+    // more precisious than Bessel relation:
+    // detail::hypergeometric_0f1_bessel(b, z, pol);
     return detail::hypergeometric_0f1_generic_series(b, z, pol);
   }
 
   template <class T, class Policy>
   inline T hypergeometric_1f0_imp(T a, T z, const Policy& pol)
   {
+    BOOST_MATH_STD_USING
+
     // some special cases
-    // ...
+    //if (fabs(z - 1) >= 1)
+    //{
+      //std::cout << "special case\n";
+      //return pow(1 - z, -a);
+    //}
 
     return detail::hypergeometric_1f0_generic_series(a, z, pol);
   }
