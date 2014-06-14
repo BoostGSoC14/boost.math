@@ -41,14 +41,13 @@
   {
     BOOST_MATH_STD_USING
 
-    // some special cases
-    //if (fabs(z - 1) >= 1)
-    //{
-      //std::cout << "special case\n";
-      //return pow(1 - z, -a);
-    //}
+    if (z == 1)
+      return policies::raise_pole_error<T>(
+        "boost::math::hypergeometric_1f0<%1%,%1%>(%1%, %1%)",
+        "Evaluation of 1f0 with z = %1%.", z, pol);
 
-    return detail::hypergeometric_1f0_generic_series(a, z, pol);
+    // more naive and cconvergent method than series
+    return pow(1 - z, -a);
   }
 
   template <class T, class Policy>
