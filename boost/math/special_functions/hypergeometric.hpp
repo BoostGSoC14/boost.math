@@ -92,6 +92,16 @@
   {
     static const char* const function = "boost::math::hypergeometric_1f2<%1%,%1%,%1%,%1%>(%1%,%1%,%1%,%1%)";
 
+    if (z == 0)
+      return T(1);
+
+    // check for parameter equality
+    if (a == b1 || a == b2)
+    {
+      const T b = (a == b1) ? b2 : b1; 
+      return detail::hypergeometric_0f1_imp(b, z, pol);
+    }
+
     // undefined result:
     if (!detail::check_hypergeometric_1f1_parameters(a, b1) ||
         !detail::check_hypergeometric_1f1_parameters(a, b2))
