@@ -16,6 +16,23 @@
 
   namespace boost { namespace math { namespace detail {
 
+  template <class T>
+  inline bool check_hypergeometric_1f1_parameters(const T& a, const T& b)
+  {
+    BOOST_MATH_STD_USING
+
+    if (b <= 0 && b == floor(b))
+    {
+      if (a >= 0)
+        return false;
+
+      if (a < b && a == floor(a))
+        return false;
+    }
+
+    return true;
+  }
+
   template <class T, class Policy>
   inline T hypergeometric_0f1_imp(T b, T z, const Policy& pol)
   {
@@ -58,12 +75,14 @@
     static const char* const function = "boost::math::hypergeometric_1f1<%1%,%1%,%1%>(%1%,%1%,%1%)";
 
     // undefined result:
-    if (b <= 0 && a < b && a == floor(a) && b == floor(b))
+    if (!detail::check_hypergeometric_1f1_parameters(a, b))
+    {
       return policies::raise_domain_error<T>(
         function,
-        "Function is indeterminate for negative integer b = %1% and a < b.",
-        z,
+        "Function is indeterminate for negative integer b = %1%.",
+        b,
         pol);
+    }
 
     return detail::hypergeometric_1f1_generic_series(a, b, z, pol);
   }
@@ -71,8 +90,18 @@
   template <class T, class Policy>
   inline T hypergeometric_1f2_imp(T a, T b1, T b2, T z, const Policy& pol)
   {
-    // some special cases
-    // ...
+    static const char* const function = "boost::math::hypergeometric_1f2<%1%,%1%,%1%,%1%>(%1%,%1%,%1%,%1%)";
+
+    // undefined result:
+    if (!detail::check_hypergeometric_1f1_parameters(a, b1) ||
+        !detail::check_hypergeometric_1f1_parameters(a, b2))
+    {
+      return policies::raise_domain_error<T>(
+        function,
+        "Function is indeterminate for negative integer b = %1%.",
+        b1 <= b2 ? b1 : b2,
+        pol);
+    }
 
     return detail::hypergeometric_1f2_generic_series(a, b1, b2, z, pol);
   }
@@ -80,8 +109,18 @@
   template <class T, class Policy>
   inline T hypergeometric_2f1_imp(T a1, T a2, T b, T z, const Policy& pol)
   {
-    // some special cases
-    // ...
+    static const char* const function = "boost::math::hypergeometric_2f1<%1%,%1%,%1%,%1%>(%1%,%1%,%1%,%1%)";
+
+    // undefined result:
+    if (!detail::check_hypergeometric_1f1_parameters(a1, b) ||
+        !detail::check_hypergeometric_1f1_parameters(a2, b))
+    {
+      return policies::raise_domain_error<T>(
+        function,
+        "Function is indeterminate for negative integer b = %1%.",
+        b,
+        pol);
+    }
 
     return detail::hypergeometric_2f1_generic_series(a1, a2, b, z, pol);
   }
