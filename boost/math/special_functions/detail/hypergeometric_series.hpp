@@ -147,6 +147,10 @@
     const T a1, a2, b, z;
   };
 
+  // we don't need to define extra check and make a polinom from
+  // series, when p(i) and q(i) are negative integers and p(i) >= q(i)
+  // as described in functions.wolfram.alpha, because we always
+  // stop summation when result (in this case numerator) is null.
   template <class T, unsigned p, unsigned q, class Policy>
   inline T sum_pfq_series(detail::hypergeometric_pfq_generic_series_term<T, p, q>& term, const Policy& pol)
   {
