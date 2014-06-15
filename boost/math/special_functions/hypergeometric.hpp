@@ -23,7 +23,7 @@
 
     // some special cases
     if (z == 0)
-      return 1;
+      return T(1);
 
     if (b <= 0 && b == floor(b))
       return policies::raise_pole_error<T>(
@@ -44,7 +44,9 @@
     if (z == 1)
       return policies::raise_pole_error<T>(
         "boost::math::hypergeometric_1f0<%1%,%1%>(%1%, %1%)",
-        "Evaluation of 1f0 with z = %1%.", z, pol);
+        "Evaluation of 1f0 with z = %1%.",
+        z,
+        pol);
 
     // more naive and cconvergent method than series
     return pow(1 - z, -a);
@@ -53,8 +55,15 @@
   template <class T, class Policy>
   inline T hypergeometric_1f1_imp(T a, T b, T z, const Policy& pol)
   {
-    // some special cases
-    // ...
+    static const char* const function = "boost::math::hypergeometric_1f1<%1%,%1%,%1%>(%1%,%1%,%1%)";
+
+    // undefined result:
+    if (b <= 0 && a < b && a == floor(a) && b == floor(b))
+      return policies::raise_domain_error<T>(
+        function,
+        "Function is indeterminate for negative integer b = %1% and a < b.",
+        z,
+        pol);
 
     return detail::hypergeometric_1f1_generic_series(a, b, z, pol);
   }
