@@ -92,7 +92,7 @@
   {
     static const char* const function = "boost::math::hypergeometric_1f2<%1%,%1%,%1%,%1%>(%1%,%1%,%1%,%1%)";
 
-    if (z == 0)
+    if (z == 0 || a == 0)
       return T(1);
 
     // check for parameter equality
