@@ -18,10 +18,9 @@
   // Luke: C ------- SUBROUTINE R1F1P(AP, CP, Z, A, B, N) ---------
   // Luke: C --- RATIONAL APPROXIMATION OF 1F1( AP ; CP ; -Z ) ----
   template <class T, class Policy>
-  inline T hypergeometric_1f1_rational(const T& ap, const T& cp, const T& zp, const unsigned n, const Policy& pol)
+  inline T hypergeometric_1f1_rational(const T& ap, const T& cp, const T& zp, const Policy& pol)
   {
     BOOST_MATH_STD_USING
-    BOOST_ASSERT(n >= 4u);
 
     static const T zero = T(0), one = T(1), two = T(2), three = T(3);
 
@@ -44,8 +43,12 @@
     T a3 = b3 - ((one + ct2) * ct1);
     ct1 = three;
 
+    const unsigned max_iterations = boost::math::policies::get_max_series_iterations<Policy>();
+
     T a4 = T(0), b4 = T(0);
-    for (unsigned k = 2; k < n; ++k)
+    T result = T(0), prev_result = a3 / b3;
+
+    for (unsigned k = 2; k < max_iterations; ++k)
     {
       // Luke: C ----- CALCULATION OF THE MULTIPLIERS -----
       // Luke: C ----------- FOR THE RECURSION ------------
@@ -59,6 +62,14 @@
       // Luke: C ------------ ARE AS FOLLOWS --------------
       b4 = (g1 * b3) + (g2 * b2) + (g3 * b1);
       a4 = (g1 * a3) + (g2 * a2) + (g3 * a1);
+
+      prev_result = result;
+      result = a4 / b4;
+
+      // condition for interruption
+      if (fabs(result - prev_result) < boost::math::tools::epsilon<T>())
+        break;
+
       b1 = b2; b2 = b3; b3 = b4;
       a1 = a2; a2 = a3; a3 = a4;
 
@@ -66,7 +77,7 @@
       ct1 += two;
     }
 
-    return a4 / b4;
+    return result;
   }
 
   // Luke: C ----- SUBROUTINE R2F1P(AB, BP, CP, Z, A, B, N) -------
@@ -75,7 +86,6 @@
   inline T hypergeometric_2f1_rational(const T& ap, const T& bp, const T& cp, const T& zp, const unsigned n, const Policy& pol)
   {
     BOOST_MATH_STD_USING
-    BOOST_ASSERT(n >= 4u);
 
     static const T one = T(1), two = T(2), three = T(3), four = T(4),
                    six = T(6), half_7 = T(3.5), half_3 = T(1.5), forth_3 = T(0.75);
