@@ -13,9 +13,11 @@
 
   #include <boost/math/special_functions/detail/hypergeometric_series.hpp>
   #include <boost/math/special_functions/detail/hypergeometric_0f1_bessel.hpp>
+  #include <boost/math/special_functions/detail/hypergeometric_asym.hpp>
 
   namespace boost { namespace math { namespace detail {
 
+  // check when 1f1 series can't decay to polynom
   template <class T>
   inline bool check_hypergeometric_1f1_parameters(const T& a, const T& b)
   {
@@ -56,7 +58,7 @@
   template <class T, class Policy>
   inline T hypergeometric_1f0_imp(T a, T z, const Policy& pol)
   {
-    BOOST_MATH_STD_USING
+    BOOST_MATH_STD_USING // pow
 
     if (z == 1)
       return policies::raise_pole_error<T>(
@@ -65,24 +67,53 @@
         z,
         pol);
 
-    // more naive and cconvergent method than series
+    // more naive and convergent method than series
     return pow(1 - z, -a);
   }
 
   template <class T, class Policy>
   inline T hypergeometric_1f1_imp(T a, T b, T z, const Policy& pol)
   {
+    BOOST_MATH_STD_USING // exp, fabs, sqrt
+
     static const char* const function = "boost::math::hypergeometric_1f1<%1%,%1%,%1%>(%1%,%1%,%1%)";
+
+    if (z == 0 || a == 0)
+      return T(1);
 
     // undefined result:
     if (!detail::check_hypergeometric_1f1_parameters(a, b))
-    {
       return policies::raise_domain_error<T>(
         function,
         "Function is indeterminate for negative integer b = %1%.",
         b,
         pol);
+
+    // other checks:
+    if (a == -1)
+      return 1 - (z / b);
+
+    const T b_minus_a = b - a;
+
+    // 0f0 (exp) case;
+    if (b_minus_a == 0)
+      return exp(z);
+
+    if (b_minus_a == -1)
+      return (1 + (z / b)) * exp(z);
+
+    // check for poles in gamma
+    if ((a > 0 || a != floor(a)) &&
+        (b > 0 || b != floor(b)))
+    {
+      // asymp expansion
+      if (detail::hypergeometric_1f1_asym_region(a, b, z))
+        return boost::math::detail::hypergeometric_1f1_asym_series(a, b, z, pol);
     }
+
+    // kummer's transformation
+    if (z < 0)
+      return exp(z) * detail::hypergeometric_1f1_imp<T>(b_minus_a, b, -z, pol);
 
     return detail::hypergeometric_1f1_generic_series(a, b, z, pol);
   }

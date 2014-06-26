@@ -106,6 +106,15 @@
     return result_a + result_b;
   }
 
+  // experimental range
+  template <class T>
+  inline bool hypergeometric_1f1_asym_region(const T& a, const T& b, const T& z)
+  {
+    if (z > 100 && (std::max)(T(1), T(fabs(b - a))) * (std::max)(T(1), T(fabs(1 - a))) < 0.5 * z) // TODO: not a good way
+      return true;
+    return false;
+  }
+
   } } } // namespaces
 
 #endif // BOOST_MATH_HYPERGEOMETRIC_ASYM_HPP
