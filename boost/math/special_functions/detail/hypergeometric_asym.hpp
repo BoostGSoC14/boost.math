@@ -85,6 +85,11 @@
     policies::check_series_iterations<T>(function, max_iter, pol);
     result_a *= prefix_a;
 
+    // in case gamma(b-a) equals to pole we break off
+    // our computation because next summand becomes zero
+    if (a == floor(a) && b == floor(b) && (b - a) < 0)
+      return result_a;
+
     const T prefix_b = boost::math::cos_pi(a, pol) /
         (boost::math::tgamma((b - a), pol) * pow(z, a));
     hypergeometric_1f1_asym_series_term_b<T, Policy> s_b(a, b, z);
