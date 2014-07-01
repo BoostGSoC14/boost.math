@@ -11,8 +11,13 @@ namespace boost{ namespace math {
 
 namespace
 {
+using namespace policies;
 
-const boost::math::policies::policy<> pol;
+const policy<
+  overflow_error<ignore_error>,
+  underflow_error<ignore_error>,
+  denorm_error<ignore_error>
+      > pol;
 
 }
 
