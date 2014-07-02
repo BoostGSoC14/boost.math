@@ -102,18 +102,17 @@
     if (b_minus_a == -1)
       return (1 + (z / b)) * exp(z);
 
-    // check for poles in gamma
-    if ((a > 0 || a != floor(a)) &&
-        (b > 0 || b != floor(b)))
-    {
-      // asymp expansion
-      if (detail::hypergeometric_1f1_asym_region(a, b, z))
-        return boost::math::detail::hypergeometric_1f1_asym_series(a, b, z, pol);
-    }
-
     // kummer's transformation
     if (z < 0)
       return exp(z) * detail::hypergeometric_1f1_imp<T>(b_minus_a, b, -z, pol);
+
+    // check for poles in gamma
+    if (b > 0 || b != floor(b))
+    {
+      // asymp expansion
+      if (detail::hypergeometric_1f1_asym_region(a, b, z))
+        return detail::hypergeometric_1f1_asym_series(a, b, z, pol);
+    }
 
     return detail::hypergeometric_1f1_generic_series(a, b, z, pol);
   }
@@ -129,7 +128,7 @@
     // check for parameter equality
     if (a == b1 || a == b2)
     {
-      const T b = (a == b1) ? b2 : b1; 
+      const T b = (a == b1) ? b2 : b1;
       return detail::hypergeometric_0f1_imp(b, z, pol);
     }
 

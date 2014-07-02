@@ -73,27 +73,37 @@
     BOOST_MATH_STD_USING
     static const char* const function = "boost::math::hypergeometric_1f1_asym_series<%1%>(%1%,%1%,%1%)";
 
-    const T prefix_a = (exp(z) * boost::math::tgamma_ratio(b, a, pol)) * pow(z, (a - b));
-    hypergeometric_1f1_asym_series_term_a<T, Policy> s_a(a, b, z);
-    boost::uintmax_t max_iter = policies::get_max_series_iterations<Policy>();
+    const bool is_a_integer = (a == floor(a));
+    const bool is_b_integer = (b == floor(b));
+
+    T result_a = T(0);
+
+    // in case gamma(a) equals to pole
+    // next summand becomes zero
+    if (!is_a_integer && (a < 0))
+    {
+      const T prefix_a = (exp(z) * boost::math::tgamma_ratio(b, a, pol)) * pow(z, (a - b));
+      hypergeometric_1f1_asym_series_term_a<T, Policy> s_a(a, b, z);
+      boost::uintmax_t max_iter = policies::get_max_series_iterations<Policy>();
 #if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x582))
-    const T zero = 0;
-    T result_a = boost::math::tools::sum_series(s_a, boost::math::policies::get_epsilon<T, Policy>(), max_iter, zero);
+      const T zero = 0;
+      result_a = boost::math::tools::sum_series(s_a, boost::math::policies::get_epsilon<T, Policy>(), max_iter, zero);
 #else
-    T result_a = boost::math::tools::sum_series(s_a, boost::math::policies::get_epsilon<T, Policy>(), max_iter);
+      result_a = boost::math::tools::sum_series(s_a, boost::math::policies::get_epsilon<T, Policy>(), max_iter);
 #endif
-    policies::check_series_iterations<T>(function, max_iter, pol);
-    result_a *= prefix_a;
+      policies::check_series_iterations<T>(function, max_iter, pol);
+      result_a *= prefix_a;
+    }
 
     // in case gamma(b-a) equals to pole we break off
     // our computation because next summand becomes zero
-    if (a == floor(a) && b == floor(b) && (b - a) < 0)
+    if (is_a_integer && is_b_integer && (b - a) < 0)
       return result_a;
 
     const T prefix_b = boost::math::cos_pi(a, pol) /
         (boost::math::tgamma((b - a), pol) * pow(z, a));
     hypergeometric_1f1_asym_series_term_b<T, Policy> s_b(a, b, z);
-    max_iter = policies::get_max_series_iterations<Policy>();
+    boost::uintmax_t max_iter = policies::get_max_series_iterations<Policy>();
 #if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x582))
     const T zero = 0;
     T result_b  = boost::math::tools::sum_series(s_b, boost::math::policies::get_epsilon<T, Policy>(), max_iter, zero);
