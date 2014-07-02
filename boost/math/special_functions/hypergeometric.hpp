@@ -153,6 +153,14 @@
   }
 
   template <class T, class Policy>
+  inline T hypergeometric_2f0_imp(T a1, T a2, T z, const Policy& pol)
+  {
+    static const char* const function = "boost::math::hypergeometric_2f0<%1%,%1%,%1%>(%1%,%1%,%1%)";
+
+    return detail::hypergeometric_2f0_generic_series(a1, a2, z, pol);
+  }
+
+  template <class T, class Policy>
   inline T hypergeometric_2f1_imp(T a1, T a2, T b, T z, const Policy& pol)
   {
     static const char* const function = "boost::math::hypergeometric_2f1<%1%,%1%,%1%,%1%>(%1%,%1%,%1%,%1%)";
@@ -278,6 +286,33 @@
   inline typename tools::promote_args<T1, T2, T3, T4>::type hypergeometric_1f2(T1 a, T2 b1, T3 b2, T4 z)
   {
     return hypergeometric_1f2(a, b1, b2, z, policies::policy<>());
+  }
+
+  template <class T1, class T2, class T3, class Policy>
+  inline typename tools::promote_args<T1, T2, T3>::type hypergeometric_2f0(T1 a1, T2 a2, T3 z, const Policy& /* pol */)
+  {
+    BOOST_FPU_EXCEPTION_GUARD
+    typedef typename tools::promote_args<T1, T2, T3>::type result_type;
+    typedef typename policies::evaluation<result_type, Policy>::type value_type;
+    typedef typename policies::normalise<
+       Policy,
+       policies::promote_float<false>,
+       policies::promote_double<false>,
+       policies::discrete_quantile<>,
+       policies::assert_undefined<> >::type forwarding_policy;
+    return policies::checked_narrowing_cast<result_type, Policy>(
+          detail::hypergeometric_2f0_imp<value_type>(
+                static_cast<value_type>(a1),
+                static_cast<value_type>(a2),
+                static_cast<value_type>(z),
+                forwarding_policy()),
+          "boost::math::hypergeometric_2f0<%1%>(%1%,%1%,%1%)");
+  }
+
+  template <class T1, class T2, class T3>
+  inline typename tools::promote_args<T1, T2, T3>::type hypergeometric_2f0(T1 a1, T2 a2, T3 z)
+  {
+    return hypergeometric_2f0(a1, a2, z, policies::policy<>());
   }
 
   template <class T1, class T2, class T3, class T4, class Policy>

@@ -121,6 +121,32 @@
     const T a, b1, b2, z;
   };
 
+  // partial specialization for 2F0
+  template <class T>
+  struct hypergeometric_pfq_generic_series_term<T, 2u, 0u>
+  {
+    typedef T result_type;
+
+    hypergeometric_pfq_generic_series_term(const T& a1, const T& a2, const T& z)
+       : n(0), term(1), a1(a1), a2(a2), z(z)
+    {
+    }
+
+    T operator()()
+    {
+      BOOST_MATH_STD_USING
+      const T r = term;
+      term *= (((a1 + n) * (a2 + n) / (n + 1)) * z);
+      ++n;
+      return r;
+    }
+
+  private:
+    unsigned n;
+    T term;
+    const T a1, a2, z;
+  };
+
   // partial specialization for 2F1
   template <class T>
   struct hypergeometric_pfq_generic_series_term<T, 2u, 1u>
@@ -150,7 +176,7 @@
   // we don't need to define extra check and make a polinom from
   // series, when p(i) and q(i) are negative integers and p(i) >= q(i)
   // as described in functions.wolfram.alpha, because we always
-  // stop summation when result (in this case numerator) is null.
+  // stop summation when result (in this case numerator) is zero.
   template <class T, unsigned p, unsigned q, class Policy>
   inline T sum_pfq_series(detail::hypergeometric_pfq_generic_series_term<T, p, q>& term, const Policy& pol)
   {
@@ -191,6 +217,13 @@
   inline T hypergeometric_1f2_generic_series(const T& a, const T& b1, const T& b2, const T& z, const Policy& pol)
   {
     detail::hypergeometric_pfq_generic_series_term<T, 1u, 2u> s(a, b1, b2, z);
+    return detail::sum_pfq_series(s, pol);
+  }
+
+  template <class T, class Policy>
+  inline T hypergeometric_2f0_generic_series(const T& a1, const T& a2, const T& z, const Policy& pol)
+  {
+    detail::hypergeometric_pfq_generic_series_term<T, 2u, 0u> s(a1, a2, z);
     return detail::sum_pfq_series(s, pol);
   }
 
