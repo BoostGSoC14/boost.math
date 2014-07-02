@@ -13,7 +13,10 @@
 
   #include <boost/math/special_functions/detail/hypergeometric_series.hpp>
   #include <boost/math/special_functions/detail/hypergeometric_0f1_bessel.hpp>
+  #include <boost/math/special_functions/detail/hypergeometric_1f1_bessel.hpp>
   #include <boost/math/special_functions/detail/hypergeometric_asym.hpp>
+
+  #include <boost/math/special_functions/sign.hpp>
 
   namespace boost { namespace math { namespace detail {
 
@@ -113,6 +116,9 @@
       if (detail::hypergeometric_1f1_asym_region(a, b, z))
         return detail::hypergeometric_1f1_asym_series(a, b, z, pol);
     }
+
+    if (boost::math::copysign(a, z) && (b != (2 * a)))
+      return detail::hypergeometric_1f1_13_3_7_series(a, b, z, pol);
 
     return detail::hypergeometric_1f1_generic_series(a, b, z, pol);
   }
