@@ -105,7 +105,7 @@
     if (b_minus_a == -1)
       return (1 + (z / b)) * exp(z);
 
-    // kummer's transformation
+    // Kummer's transformation
     if (z < 0)
       return exp(z) * detail::hypergeometric_1f1_imp<T>(b_minus_a, b, -z, pol);
 
@@ -117,7 +117,9 @@
         return detail::hypergeometric_1f1_asym_series(a, b, z, pol);
     }
 
-    if (boost::math::copysign(a, z) && (b != (2 * a)))
+    // in this case after Kummer's tranformation z is always greather than zero;
+    // probably just check a < 0 is better, but this one is more readable
+    if ((boost::math::sign(a) != boost::math::sign(z)) && (b != (2 * a)))
       return detail::hypergeometric_1f1_13_3_7_series(a, b, z, pol);
 
     return detail::hypergeometric_1f1_generic_series(a, b, z, pol);
