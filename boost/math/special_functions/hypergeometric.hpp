@@ -157,7 +157,27 @@
   template <class T, class Policy>
   inline T hypergeometric_2f0_imp(T a1, T a2, T z, const Policy& pol)
   {
+    BOOST_MATH_STD_USING
     static const char* const function = "boost::math::hypergeometric_2f0<%1%,%1%,%1%>(%1%,%1%,%1%)";
+
+    const bool is_a1_integer = (a1 == floor(a1));
+    const bool is_a2_integer = (a2 == floor(a2));
+
+    if(is_a1_integer && is_a2_integer)
+    {
+      if ((a1 < 1) && (a2 <= a1))
+      {
+        const boost::uintmax_t n = -a1;
+
+        return (pow(z, n) * boost::math::factorial<T>(n, pol)) *
+          boost::math::laguerre(n, (-a2 - n), -(1 / z), pol);
+      }
+      else if ((a2 < 1) && (a1 <= a2))
+      {
+        // function is symmetric for a1 and a2
+        return detail::hypergeometric_2f0_imp(a2, a1, z, pol);
+      }
+    }
 
     return detail::hypergeometric_2f0_generic_series(a1, a2, z, pol);
   }
