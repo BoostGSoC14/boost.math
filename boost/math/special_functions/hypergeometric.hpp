@@ -39,7 +39,7 @@
   }
 
   template <class T, class Policy>
-  inline T hypergeometric_0f1_imp(T b, T z, const Policy& pol)
+  inline T hypergeometric_0f1_imp(const T& b, const T& z, const Policy& pol)
   {
     BOOST_MATH_STD_USING
 
@@ -59,7 +59,7 @@
   }
 
   template <class T, class Policy>
-  inline T hypergeometric_1f0_imp(T a, T z, const Policy& pol)
+  inline T hypergeometric_1f0_imp(const T& a, const T& z, const Policy& pol)
   {
     BOOST_MATH_STD_USING // pow
 
@@ -75,7 +75,7 @@
   }
 
   template <class T, class Policy>
-  inline T hypergeometric_1f1_imp(T a, T b, T z, const Policy& pol)
+  inline T hypergeometric_1f1_imp(const T& a, const T& b, const T& z, const Policy& pol)
   {
     BOOST_MATH_STD_USING // exp, fabs, sqrt
 
@@ -126,7 +126,7 @@
   }
 
   template <class T, class Policy>
-  inline T hypergeometric_1f2_imp(T a, T b1, T b2, T z, const Policy& pol)
+  inline T hypergeometric_1f2_imp(const T& a, const T& b1, const T& b2, const T& z, const Policy& pol)
   {
     static const char* const function = "boost::math::hypergeometric_1f2<%1%,%1%,%1%,%1%>(%1%,%1%,%1%,%1%)";
 
@@ -155,7 +155,7 @@
   }
 
   template <class T, class Policy>
-  inline T hypergeometric_2f0_imp(T a1, T a2, T z, const Policy& pol)
+  inline T hypergeometric_2f0_imp(const T& a1, const T& a2, const T& z, const Policy& pol)
   {
     BOOST_MATH_STD_USING
     static const char* const function = "boost::math::hypergeometric_2f0<%1%,%1%,%1%>(%1%,%1%,%1%)";
@@ -183,7 +183,7 @@
   }
 
   template <class T, class Policy>
-  inline T hypergeometric_2f1_imp(T a1, T a2, T b, T z, const Policy& pol)
+  inline T hypergeometric_2f1_imp(const T& a1, const T& a2, const T& b, const T& z, const Policy& pol)
   {
     static const char* const function = "boost::math::hypergeometric_2f1<%1%,%1%,%1%,%1%>(%1%,%1%,%1%,%1%)";
 
