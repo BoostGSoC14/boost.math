@@ -43,10 +43,10 @@
   template <class T, class Policy>
   inline T hypergeometric_1f1_backward_recurrence_for_negative_a(const T& a, const T& b, const T& z, const Policy& pol)
   {
-    BOOST_MATH_STD_USING
+    BOOST_MATH_STD_USING // modf, fabs
 
     T integer_part = 0;
-    T ak = boost::math::modf(a, &integer_part, pol);
+    T ak = modf(a, &integer_part);
 
     // we will never get to infinite recursion here:
     T first = detail::hypergeometric_1f1_imp(ak, b, z, pol);
