@@ -60,6 +60,29 @@
     T b;
   };
 
+  template <class T>
+  struct hypergeometric_1f1_recurrence_a_and_b_next_coefficients
+  {
+    typedef std::pair<T, T> result_type;
+
+    hypergeometric_1f1_recurrence_a_and_b_next_coefficients(const T& a, const T& b, const T& z):
+      z(z), a(a), b(b)
+    {
+    }
+
+    result_type operator()()
+    {
+      const T cn = a * z;
+      const result_type result = std::make_pair<T, T>((b * (1 - b)) / cn, (b * ((1 - b) + z)) / cn);
+      --a; --b;
+      return result;
+    }
+
+  private:
+    const T z;
+    T a, b;
+  };
+
   template <class T, class NextCoefs>
   inline T hypergeometric_1f1_recurrence(NextCoefs& get_coefs, const T& last_index, T& first, T& second)
   {
@@ -121,6 +144,29 @@
     // probably we will need to change type of last and k from T to boost::uintmax_t
     const T last_index = fabs(integer_part);
     detail::hypergeometric_1f1_recurrence_b_next_coefficients<T> s(a, bk, z);
+
+    return detail::hypergeometric_1f1_recurrence(s, last_index, first, second);
+  }
+
+  // this method works provided that integer part of a is the same as integer part of b
+  // we don't make this check inside it
+  template <class T, class Policy>
+  inline T hypergeometric_1f1_backward_recurrence_for_negative_a_and_b(const T& a, const T& b, const T& z, const Policy& pol)
+  {
+    BOOST_MATH_STD_USING // modf, fabs
+
+    T integer_part = 0;
+    T ak = modf(a, &integer_part);
+    T bk = modf(b, &integer_part);
+
+    // we will never get to infinite recursion here:
+    T first = detail::hypergeometric_1f1_imp(ak, bk, z, pol);
+    --ak; --bk;
+    T second = detail::hypergeometric_1f1_imp(ak, bk, z, pol);
+
+    // probably we will need to change type of last and k from T to boost::uintmax_t
+    const T last_index = fabs(integer_part);
+    detail::hypergeometric_1f1_recurrence_a_and_b_next_coefficients<T> s(ak, bk, z);
 
     return detail::hypergeometric_1f1_recurrence(s, last_index, first, second);
   }
