@@ -120,7 +120,14 @@
     // in this case after Kummer's tranformation z is always greather than zero;
     // probably just check a < 0 is better, but this one is more readable
     if ((boost::math::sign(a) != boost::math::sign(z)) && (b != (2 * a)))
-      return detail::hypergeometric_1f1_13_3_7_series(a, b, z, pol);
+    {
+      const bool is_sqrt_would_have_been_nan = (2 * (z  * (b - (2 * a)))) < 0;
+      // check for correct parameters for Bessel function inside asym series
+      if (!is_sqrt_would_have_been_nan)
+      {
+        return detail::hypergeometric_1f1_13_3_7_series(a, b, z, pol);
+      }
+    }
 
     return detail::hypergeometric_1f1_generic_series(a, b, z, pol);
   }
