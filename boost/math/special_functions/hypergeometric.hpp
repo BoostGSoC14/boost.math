@@ -106,7 +106,8 @@
       return (1 + (z / b)) * exp(z);
 
     // Kummer's transformation
-    if (z < 0)
+    // we also don't transform if z belongs to [-1,0]
+    if (z < -1)
       return exp(z) * detail::hypergeometric_1f1_imp<T>(b_minus_a, b, -z, pol);
 
     // check for poles in gamma
@@ -117,9 +118,10 @@
         return detail::hypergeometric_1f1_asym_series(a, b, z, pol);
     }
 
-    // in this case after Kummer's tranformation z is always greather than zero;
+    // we use A&S 13.3.7 formula, when sign(z) != sign(a), but
+    // after Kummer's tranformation z is always greather than zero;
     // probably just check a < 0 is better, but this one is more readable
-    if ((boost::math::sign(a) != boost::math::sign(z)) && (b != (2 * a)))
+    if ((boost::math::sign(a) != boost::math::sign(z + 1)) && (b != (2 * a)))
     {
       const bool would_sqrt_have_been_nan = (2 * (z  * (b - (2 * a)))) < 0;
       // check for correct parameters for Bessel function inside asym series
