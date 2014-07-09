@@ -80,7 +80,7 @@
 
     // in case gamma(a) equals to pole
     // next summand becomes zero
-    if (!is_a_integer && (a < 0))
+    if (!is_a_integer || (a > 0))
     {
       const T prefix_a = (exp(z) * boost::math::tgamma_ratio(b, a, pol)) * pow(z, (a - b));
       hypergeometric_1f1_asym_series_term_a<T, Policy> s_a(a, b, z);
