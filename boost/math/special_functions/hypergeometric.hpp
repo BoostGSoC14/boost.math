@@ -81,7 +81,7 @@
 
     static const char* const function = "boost::math::hypergeometric_1f1<%1%,%1%,%1%>(%1%,%1%,%1%)";
 
-    if (z == 0 || a == 0)
+    if ((z == 0) || (a == 0))
       return T(1);
 
     // undefined result:
@@ -111,17 +111,16 @@
       return exp(z) * detail::hypergeometric_1f1_imp<T>(b_minus_a, b, -z, pol);
 
     // check for poles in gamma
-    if (b > 0 || b != floor(b))
+    if ((b > 0) || (b != floor(b)))
     {
       // asymp expansion
       if (detail::hypergeometric_1f1_asym_region(a, b, z))
         return detail::hypergeometric_1f1_asym_series(a, b, z, pol);
     }
 
-    // we use A&S 13.3.7 formula, when sign(z) != sign(a), but
-    // after Kummer's tranformation z is always greather than zero;
-    // probably just check a < 0 is better, but this one is more readable
-    if ((boost::math::sign(a) != boost::math::sign(z + 1)) && (b != (2 * a)))
+    // we use A&S 13.3.7 formula when sign(z) != sign(a),
+    // but after Kummer's tranformation z is always greather than zero;
+    if ((boost::math::sign(a) != boost::math::sign(z + 1)) && (a < -10) && (b != (2 * a)))
     {
       const bool would_sqrt_have_been_nan = (2 * (z  * (b - (2 * a)))) < 0;
       // check for correct parameters for Bessel function inside asym series
