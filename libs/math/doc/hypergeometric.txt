@@ -13,7 +13,7 @@ and the argument z can be real or complex.
 
 The generalized hypergeometric series is remarkably versatile because
 many well-known functions of pure and applied mathematics are special
-cases of the generalized hypergeometric series. Some well-known special cases
+cases of the generalized hypergeometric series. For example, some special cases
 of the generalized hypergeometric series include various mathematical constants,
 elementary transcendental functions, Bessel functions,
 the incomplete gamma function, confluent hypergemetric functions,
@@ -30,11 +30,11 @@ http://en.wikipedia.org/wiki/Generalized_hypergeometric_function
 The generalized hypergeometric series can be extended to include
 non-rational coefficients. This results in a series that can be
 successfully numerically calculated in certain parameter ranges.
-Generalized hypergeometric series with irrational coefficients,
-however, do not correspond to any known special functions.
+Generalized hypergeometric series having irrational coefficients,
+however, do not usually correspond to any known special functions.
 We will call generalized hypergeometric series with irrational
 coefficients generalized hypergeometric functions.
-TBD: Chris : verify this!
+TBD: Chris : verify this paragraph.
 
 The Boost.Math library does not intend to provide support for all
 generalized hypergeometric functions with unlimited numbers of
