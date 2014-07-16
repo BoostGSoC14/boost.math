@@ -11,116 +11,63 @@
 #ifndef BOOST_MATH_HYPERGEOMETRIC_ASYM_HPP
   #define BOOST_MATH_HYPERGEOMETRIC_ASYM_HPP
 
-  namespace boost { namespace math { namespace detail {
+  namespace boost { namespace math {
 
+  // forward declaration of used function 2f0
+  template <class T1, class T2, class T3, class Policy>
+  inline typename tools::promote_args<T1, T2, T3>::type hypergeometric_2f0(T1 a1, T2 a2, T3 z, const Policy& /* pol */);
+
+  namespace detail {
+
+  // assumes a and b are not non-positive integers
   template <class T, class Policy>
-  struct hypergeometric_1f1_asym_series_term_a
-  {
-    typedef T result_type;
-
-    hypergeometric_1f1_asym_series_term_a(const T& a, const T& b, const T& z):
-      n(0), b_sub_a(b - a), one_sub_a(1 - a), z(z), term(1)
-    {
-    }
-
-    result_type operator()()
-    {
-      const T result = term;
-      ++n;
-      term *= (b_sub_a * one_sub_a) / (n * z);
-      ++b_sub_a, ++one_sub_a;
-      return result;
-    }
-
-  private:
-    unsigned n;
-    T b_sub_a;
-    T one_sub_a;
-    T z;
-    T term;
-  };
-
-  template <class T, class Policy>
-  struct hypergeometric_1f1_asym_series_term_b
-  {
-    typedef T result_type;
-
-    hypergeometric_1f1_asym_series_term_b(const T& a, const T& b, const T& z):
-      n(0), a(a), one_plus_a_sub_b(1 + a - b), z(z), term(1)
-    {
-    }
-
-    result_type operator()()
-    {
-      const T result = term;
-      ++n;
-      term *= -(a * one_plus_a_sub_b) / (n * z);
-      ++a; ++one_plus_a_sub_b;
-      return result;
-    }
-
-  private:
-    unsigned n;
-    T a;
-    T one_plus_a_sub_b;
-    T z;
-    T term;
-  };
-
-  template <class T, class Policy>
-  inline T hypergeometric_1f1_asym_series(const T& a, const T& b, const T& z, const Policy& pol)
+  inline T hypergeometric_1f1_asym_positive_series(const T& a, const T& b, const T& z, const Policy& pol)
   {
     BOOST_MATH_STD_USING
-    static const char* const function = "boost::math::hypergeometric_1f1_asym_series<%1%>(%1%,%1%,%1%)";
+    static const char* const function = "boost::math::hypergeometric_1f1_asym_positive_series<%1%>(%1%,%1%,%1%)";
 
     const bool is_a_integer = (a == floor(a));
     const bool is_b_integer = (b == floor(b));
 
-    T result_a = T(0);
+    BOOST_ASSERT(!(is_a_integer && a <= 0) && !(is_b_integer && b <= 0));
 
-    // in case gamma(a) equals to pole
-    // next summand becomes zero
-    if (!is_a_integer || (a > 0))
-    {
-      const T prefix_a = (exp(z) * boost::math::tgamma_ratio(b, a, pol)) * pow(z, (a - b));
-      hypergeometric_1f1_asym_series_term_a<T, Policy> s_a(a, b, z);
-      boost::uintmax_t max_iter = policies::get_max_series_iterations<Policy>();
-#if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x582))
-      const T zero = 0;
-      result_a = boost::math::tools::sum_series(s_a, boost::math::policies::get_epsilon<T, Policy>(), max_iter, zero);
-#else
-      result_a = boost::math::tools::sum_series(s_a, boost::math::policies::get_epsilon<T, Policy>(), max_iter);
-#endif
-      policies::check_series_iterations<T>(function, max_iter, pol);
-      result_a *= prefix_a;
-    }
+    const T gamma_ratio = (b > 0 && a > 0) ?
+      boost::math::tgamma_ratio(b, a, pol) :
+      T(boost::math::tgamma(b, pol) / boost::math::tgamma(a, pol));
+    const T prefix_a = (exp(z) * gamma_ratio) * pow(z, (a - b));
 
-    // in case gamma(b-a) equals to pole we break off
-    // our computation because next summand becomes zero
-    if (is_a_integer && is_b_integer && (b - a) < 0)
-      return result_a;
+    return prefix_a * boost::math::hypergeometric_2f0(b - a, 1 - a, 1 / z, pol);
+  }
 
-    const T prefix_b = boost::math::cos_pi(a, pol) /
-        (boost::math::tgamma((b - a), pol) * pow(z, a));
-    hypergeometric_1f1_asym_series_term_b<T, Policy> s_b(a, b, z);
-    boost::uintmax_t max_iter = policies::get_max_series_iterations<Policy>();
-#if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x582))
-    const T zero = 0;
-    T result_b  = boost::math::tools::sum_series(s_b, boost::math::policies::get_epsilon<T, Policy>(), max_iter, zero);
-#else
-    T result_b = boost::math::tools::sum_series(s_b, boost::math::policies::get_epsilon<T, Policy>(), max_iter);
-#endif
-    policies::check_series_iterations<T>(function, max_iter, pol);
-    result_b *= prefix_b;
+  // assumes b and (b - a) are not non-positive integers
+  template <class T, class Policy>
+  inline T hypergeometric_1f1_asym_negative_series(const T& a, const T& b, const T& z, const Policy& pol)
+  {
+    BOOST_MATH_STD_USING
+    static const char* const function = "boost::math::hypergeometric_1f1_asym_negative_series<%1%>(%1%,%1%,%1%)";
 
-    return result_a + result_b;
+    const T b_minus_a = b - a;
+
+    const bool is_a_integer = (a == floor(a));
+    const bool is_b_minus_a_integer = (b_minus_a == floor(b_minus_a));
+
+    BOOST_ASSERT(!(is_a_integer && a <= 0) && !(is_b_minus_a_integer && b_minus_a <= 0));
+
+    const T gamma_ratio = (b > 0 && b_minus_a > 0) ?
+      boost::math::tgamma_ratio(b, b_minus_a, pol) :
+      boost::math::tgamma(b) / boost::math::tgamma((b_minus_a), pol);
+    const T prefix_b = gamma_ratio / pow(-z, a);
+
+    return prefix_b * boost::math::hypergeometric_2f0(a, 1 - b_minus_a, -1 / z, pol);
   }
 
   // experimental range
   template <class T>
   inline bool hypergeometric_1f1_asym_region(const T& a, const T& b, const T& z)
   {
-    if (z > 100 && (std::max)(T(1), T(fabs(b - a))) * (std::max)(T(1), T(fabs(1 - a))) < 0.5 * z) // TODO: not a good way
+    BOOST_MATH_STD_USING
+
+    if (fabs(z) > 100 && (std::max)(T(1), T(fabs(b - a))) * (std::max)(T(1), T(fabs(1 - a))) < 0.5 * fabs(z)) // TODO: not a good way
       return true;
     return false;
   }
@@ -128,5 +75,3 @@
   } } } // namespaces
 
 #endif // BOOST_MATH_HYPERGEOMETRIC_ASYM_HPP
-
-

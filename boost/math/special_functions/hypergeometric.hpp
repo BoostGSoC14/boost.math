@@ -106,33 +106,42 @@
     if (b_minus_a == -1)
       return (1 + (z / b)) * exp(z);
 
+    // asymptotic expansion
+    // check region
+    if (detail::hypergeometric_1f1_asym_region(a, b, z))
+    {
+      // check for poles in gamma for b
+      if ((b > 0) || (b != floor(b)))
+      {
+        //check for poles in gamma for a
+        if (((a > 0) || (a != floor(a))) && (z > 0))
+          return detail::hypergeometric_1f1_asym_positive_series(a, b, z, pol);
+
+        //check for poles in gamma for b
+        if (((b_minus_a > 0) || (b_minus_a != floor(b_minus_a))) && (z < 0))
+          return detail::hypergeometric_1f1_asym_negative_series(a, b, z, pol);
+      }
+    }
+
     // Kummer's transformation
     // we also don't transform if z belongs to [-1,0]
     if (z < -1)
       return exp(z) * detail::hypergeometric_1f1_imp<T>(b_minus_a, b, -z, pol);
 
-    // check for poles in gamma
-    if ((b > 0) || (b != floor(b)))
-    {
-      // asymp expansion
-      if (detail::hypergeometric_1f1_asym_region(a, b, z))
-        return detail::hypergeometric_1f1_asym_series(a, b, z, pol);
-    }
-
     // we use A&S 13.3.7 formula when sign(z) != sign(a),
     // but after Kummer's tranformation z is always greather than zero;
-    if ((boost::math::sign(a) != boost::math::sign(z + 1)) && (a < -10) && (b != (2 * a)))
+    if ((boost::math::sign(a) != boost::math::sign(z + 1)) && (b != (2 * a)))
     {
       const bool would_sqrt_have_been_nan = (2 * (z  * (b - (2 * a)))) < 0;
       // check for correct parameters for Bessel function inside asym series
-      if (!would_sqrt_have_been_nan)
+      if ((!would_sqrt_have_been_nan) && (a < -10)) // TODO 13_3_7: fabs(a) seriously depends on fabs(z)
         return detail::hypergeometric_1f1_13_3_7_series(a, b, z, pol);
-    }
 
-    // we calculate numerator and denominator of Taylor series separately
-    // when -10 < a < 0. TODO: bound -10 should be revised
-    if (a < 0)
-      return detail::hypergeometric_1f1_separated_series(a, b, z, pol);
+      // we calculate numerator and denominator of Taylor series separately
+      // when -10 < a < 0
+      if (a < 0)
+        return detail::hypergeometric_1f1_separated_series(a, b, z, pol);
+    }
 
     return detail::hypergeometric_1f1_generic_series(a, b, z, pol);
   }
