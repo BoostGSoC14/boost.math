@@ -1,0 +1,90 @@
+*section : Generalized Hypergeometric Functions
+
+The generalized hypergeometric series is a power series
+having rational coefficients.
+
+The generalized hypergeometric series has the form
+
+pFq (a1, ..., ap ; b1, ..., bq ; z) = Sum_0^infty { [(a1)n ... (ap)n] / [(b1)n ... (bq)n] } z^n ,
+
+where the symbols (a1)n ... (ap)n and (b1)n ... (bq)n represent
+the so-called Pochhammer symbols (also called rising factorials)
+and the argument z can be real or complex.
+
+The generalized hypergeometric series is remarkably versatile because
+many well-known functions of pure and applied mathematics are special
+cases of the generalized hypergeometric series. For example, some special cases
+of the generalized hypergeometric series include various mathematical constants,
+elementary transcendental functions, Bessel functions,
+the incomplete gamma function, confluent hypergemetric functions,
+generalized Legendre functions, the dilogarithm function, various polynomials,
+and (infinitely) many more. In particular, the hypergeometric function
+1F1(a ; b ; x) is also called the confluent hypergeometric function of
+the first kind M(a, b, x), and the lower incomplete gamma function is
+a special case thereof.
+
+For more information, see
+
+http://en.wikipedia.org/wiki/Generalized_hypergeometric_function
+
+The generalized hypergeometric series can be extended to include
+non-rational coefficients. This results in a series that can be
+successfully numerically calculated in certain parameter ranges.
+Generalized hypergeometric series having irrational coefficients,
+however, do not usually correspond to any known special functions.
+We will call generalized hypergeometric series with irrational
+coefficients generalized hypergeometric functions.
+TBD: Chris : verify this paragraph.
+
+The Boost.Math library does not intend to provide support for all
+generalized hypergeometric functions with unlimited numbers of
+parameters and ranges of parameters and argument. But rather,
+the Boost.Math library supports selected special cases of
+generalized hypergeometric functions that frequently arise in
+science and engineering. These are described in the following 
+sections.
+
+**subsection : The Hypergeometric Function 1F1(a ; b ; x)
+
+The hypergeometric function 1F1(a ; b ; x) is calculated for real-valued
+coefficients and real-valued argument using a variety of numerical
+methods in various convergence regions.
+
+When calculating 1F1(a ; b ; x), certain tests are applied to the
+parameters a, b and the argument x in order to decide which algorithm
+is expected to have the best convergence properties. The corresponding
+algorithm is subsequently selected and used for the calculation
+of 1F1(a ; b ; x).
+
+For small parameters a, b and small argument x, a Taylor series
+is used. For example, the calculation of 1F1(1/2, 2/3, 0.1234)
+uses a Taylor series.
+
+For small parameters a, b and large argument x, a divergent
+asymptotic series is used. Here, the series is terminated
+as soon as the desired precision has been reached yet before the
+series begins to diverge. For example, the calculation of
+1F1(1/2, 2/3, 1234.5) uses a divergent asymptotic series.
+
+For small parameters a, b and intermediate argument x,
+various methods are used. These include recurrence relations
+with series of Bessel functions, recurrence relations with
+series of shifted Chebyshev polynomials, continued fractions,
+Pade approximations, and rational approximations.
+The references for these numerical methods include:
+TBD: list the references.
+TBD: Provide an example of a calculation in this intermediate
+parameter range.
+
+For some parameter ranges, there is no known convergent
+computational method for fixed-precision floating-point types.
+In these cases, an out-of-range exception is thrown.
+One such case is if the coefficient a is much larger than
+the coefficient b and the argument x is in the region of the
+coefficient a. For example, the attempted computation of
+1F1(1234, 1/4, 1000) throws an out-of-range exception.
+TBD: Is this really correct, or do we need another example
+and slight modification of the text?
+
+The following parameter ranges are supported for 1F1(a ; b ; x):
+TBD: List the supported parameter ranges.
