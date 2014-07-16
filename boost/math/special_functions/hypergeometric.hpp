@@ -12,6 +12,7 @@
   #define _BOOST_HYPERGEOMETRIC_2014_04_07_HPP_
 
   #include <boost/math/special_functions/detail/hypergeometric_series.hpp>
+  #include <boost/math/special_functions/detail/hypergeometric_separated_series.hpp>
   #include <boost/math/special_functions/detail/hypergeometric_0f1_bessel.hpp>
   #include <boost/math/special_functions/detail/hypergeometric_1f1_bessel.hpp>
   #include <boost/math/special_functions/detail/hypergeometric_asym.hpp>
@@ -125,10 +126,13 @@
       const bool would_sqrt_have_been_nan = (2 * (z  * (b - (2 * a)))) < 0;
       // check for correct parameters for Bessel function inside asym series
       if (!would_sqrt_have_been_nan)
-      {
         return detail::hypergeometric_1f1_13_3_7_series(a, b, z, pol);
-      }
     }
+
+    // we calculate numerator and denominator of Taylor series separately
+    // when -10 < a < 0. TODO: bound -10 should be revised
+    if (a < 0)
+      return detail::hypergeometric_1f1_separated_series(a, b, z, pol);
 
     return detail::hypergeometric_1f1_generic_series(a, b, z, pol);
   }
