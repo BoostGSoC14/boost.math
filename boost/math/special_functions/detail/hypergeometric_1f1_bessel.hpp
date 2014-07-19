@@ -11,6 +11,10 @@
 #ifndef BOOST_MATH_HYPERGEOMETRIC_1F1_BESSEL_HPP
   #define BOOST_MATH_HYPERGEOMETRIC_1F1_BESSEL_HPP
 
+  #include <boost/math/tools/series.hpp>
+  #include <boost/math/special_functions/bessel.hpp>
+  #include <boost/math/special_functions/laguerre.hpp>
+
   namespace boost { namespace math { namespace detail {
 
   // declarations of helpers for 13_3_7 and 13_3_8:
