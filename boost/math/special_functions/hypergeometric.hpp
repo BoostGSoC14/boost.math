@@ -106,6 +106,9 @@
     if (b_minus_a == -1)
       return (1 + (z / b)) * exp(z);
 
+    if ((a == 1) && (b == 2))
+      return (exp(z) - 1) / z;
+
     // asymptotic expansion
     // check region
     if (detail::hypergeometric_1f1_asym_region(a, b, z))
