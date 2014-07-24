@@ -191,10 +191,11 @@
     {
       if ((a1 < 1) && (a2 <= a1))
       {
-        const boost::uintmax_t n = -a1;
+        const unsigned int n = static_cast<unsigned int>(static_cast<boost::uintmax_t>(-a1));
+        const unsigned int m = static_cast<unsigned int>(static_cast<boost::uintmax_t>(-a2 - n));
 
         return (pow(z, n) * boost::math::factorial<T>(n, pol)) *
-          boost::math::laguerre(n, (-a2 - n), -(1 / z), pol);
+          boost::math::laguerre(n, m, -(1 / z), pol);
       }
       else if ((a2 < 1) && (a1 <= a2))
       {
