@@ -57,15 +57,17 @@ private:
 
 int main()
 {
-  std::cout.precision(16);
   using float_type = long double;
 
-  float_type a = 0.1, b = 0.2, z = 5;
-  unsigned m = 10u;
+  const float_type a = 0.1, b = 0.2, z = 5;
+  const unsigned m = 100u;
 
   hypergeometric_1f1_recurrence_a_and_b_next_coefficients<float_type> s(a, b, z);
-  float_type initial = boost::math::hypergeometric_1f1(a, b, z);
+  const float_type initial = boost::math::hypergeometric_1f1(a, b, z);
 
+  std::cout.precision(std::numeric_limits<float_type>::digits10);
+
+  // outputs 1f1(100.1, 100.2, 5)
   std::cout << boost::math::tools::solve_recurrence_relation_by_oliver(
       s,
       boost::math::tools::epsilon<float_type>(),
