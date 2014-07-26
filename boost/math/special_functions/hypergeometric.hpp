@@ -27,12 +27,9 @@
   {
     BOOST_MATH_STD_USING
 
-    if (b <= 0 && b == floor(b))
+    if ((b <= 0) && (b == floor(b)))
     {
-      if (a >= 0)
-        return false;
-
-      if (a < b && a == floor(a))
+      if ((a >= 0) || (a < b) || (a != floor(a)))
         return false;
     }
 
@@ -48,7 +45,7 @@
     if (z == 0)
       return T(1);
 
-    if (b <= 0 && b == floor(b))
+    if ((b <= 0) && (b == floor(b)))
       return policies::raise_pole_error<T>(
         "boost::math::hypergeometric_0f1<%1%,%1%>(%1%, %1%)",
         "Evaluation of 0f1 with nonpositive integer b = %1%.", b, pol);
@@ -72,7 +69,7 @@
         pol);
 
     // more naive and convergent method than series
-    return pow(1 - z, -a);
+    return pow(T(1 - z), T(-a));
   }
 
   template <class T, class Policy>
@@ -154,11 +151,11 @@
   {
     static const char* const function = "boost::math::hypergeometric_1f2<%1%,%1%,%1%,%1%>(%1%,%1%,%1%,%1%)";
 
-    if (z == 0 || a == 0)
+    if ((z == 0) || (a == 0))
       return T(1);
 
     // check for parameter equality
-    if (a == b1 || a == b2)
+    if ((a == b1) || (a == b2))
     {
       const T b = (a == b1) ? b2 : b1;
       return detail::hypergeometric_0f1_imp(b, z, pol);
