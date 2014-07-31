@@ -11,6 +11,12 @@
 #ifndef _BOOST_HYPERGEOMETRIC_2014_04_07_HPP_
   #define _BOOST_HYPERGEOMETRIC_2014_04_07_HPP_
 
+  #include <boost/math/tools/series.hpp>
+  #include <boost/math/policies/policy.hpp>
+  #include <boost/math/policies/error_handling.hpp>
+
+  #include <boost/math/special_functions/laguerre.hpp>
+
   #include <boost/math/special_functions/detail/hypergeometric_series.hpp>
   #include <boost/math/special_functions/detail/hypergeometric_separated_series.hpp>
   #include <boost/math/special_functions/detail/hypergeometric_0f1_bessel.hpp>

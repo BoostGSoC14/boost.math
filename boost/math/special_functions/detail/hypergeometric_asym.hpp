@@ -11,6 +11,8 @@
 #ifndef BOOST_MATH_HYPERGEOMETRIC_ASYM_HPP
   #define BOOST_MATH_HYPERGEOMETRIC_ASYM_HPP
 
+  #include <boost/math/special_functions/gamma.hpp>
+
   namespace boost { namespace math {
 
   // forward declaration of used function 2f0

@@ -11,6 +11,8 @@
 #ifndef BOOST_MATH_HYPERGEOMETRIC_SERIES_HPP
   #define BOOST_MATH_HYPERGEOMETRIC_SERIES_HPP
 
+  #include <boost/math/special_functions/bessel.hpp>
+
   namespace boost { namespace math { namespace detail {
 
   // primary template for term of Taylor series
