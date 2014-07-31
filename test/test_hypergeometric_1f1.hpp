@@ -92,7 +92,7 @@ template <class T>
 void test_hypergeometric(T, const char* name)
 {
   // function values calculated on http://wolframalpha.com/
-  static const boost::array<boost::array<T, 4>, 32> pearson_1f1_data = {{
+  static const boost::array<boost::array<T, 4>, 35> pearson_1f1_data = {{
     {{ SC_(0.1), SC_(0.2), SC_(0.5), SC_(1.31762717827850999771120412953367530104071548286484701180675) }},    // basic case, positive a, with b = 2*a
     {{ SC_(-0.1), SC_(0.2), SC_(0.5), SC_(0.695536565102261062224048114156662645634235812108270459351843) }},   // basic case, negative a
     {{ SC_(0.1), SC_(0.2), SC_(-0.5), SC_(0.799181281696560321539893636914544570179421736784530881768694) }},    // basic case, negative z, with b = 2*a
@@ -124,7 +124,10 @@ void test_hypergeometric(T, const char* name)
     {{ SC_(-5), SC_(0.1), SC_(2), SC_(19.1331126256381960551905477161181331126256381960551905477161) }},
     {{ SC_(5), SC_(2), SC_(100), SC_(1.25851372306500557378632832198689216128543415504279140966030e48) }},
     {{ SC_(-5), SC_(2), SC_(-100), SC_(1.84891398888888888888888888888888888888888888888888888888889e7) }},
-    {{ SC_(1), SC_(10e-12), SC_(1), SC_(2.71828182844739141320726036451388968000401036004750004644223e11) }},       // small b
+    {{ SC_(1), SC_(10e-12), SC_(1), SC_(2.71828182844739141320726036451388968000401036004750004644223e11) }},       // very small b
+    {{ SC_(10), SC_(10e-12), SC_(10), SC_(1.332534440738693105395841520859877375366639491043385439173436e22) }},       // very small b with larger a and z
+    {{ SC_(-1000), SC_(1), SC_(1000), SC_(-2.59382078336200571793976408157920288042214518531712673813455e215) }},       // very large negative real a and very large positive real z
+    {{ SC_(20), SC_(10), SC_(-5), SC_(-6.25682720117872755719988465952783439826492132332740217148550e-6) }},
   }};
 
   do_test_hypergeometric_1f1<T>(pearson_1f1_data, name, "John Pearson dissertation: WolframAlpha Data");
