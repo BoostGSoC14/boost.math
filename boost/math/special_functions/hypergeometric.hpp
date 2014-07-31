@@ -15,9 +15,8 @@
   #include <boost/math/special_functions/detail/hypergeometric_separated_series.hpp>
   #include <boost/math/special_functions/detail/hypergeometric_0f1_bessel.hpp>
   #include <boost/math/special_functions/detail/hypergeometric_1f1_bessel.hpp>
+  #include <boost/math/special_functions/detail/hypergeometric_1f1_recurrence.hpp>
   #include <boost/math/special_functions/detail/hypergeometric_asym.hpp>
-
-  #include <boost/math/special_functions/sign.hpp>
 
   namespace boost { namespace math { namespace detail {
 
@@ -100,7 +99,7 @@
     if (b_minus_a == 0)
       return exp(z);
 
-    if (b_minus_a == -1)
+    if ((b_minus_a == -1) && ((a > 0) && (a != floor(a)))) // revise for negative a and b; probably && ((a > 0) && (a != floor(a))
       return (1 + (z / b)) * exp(z);
 
     if ((a == 1) && (b == 2))
@@ -123,24 +122,19 @@
       }
     }
 
-    // Kummer's transformation
-    // we also don't transform if z belongs to [-1,0]
+    // Let's make z positive (almost always)
+    // by Kummer's transformation
+    // (we also don't transform if z belongs to [-1,0])
     if (z < -1)
       return exp(z) * detail::hypergeometric_1f1_imp<T>(b_minus_a, b, -z, pol);
 
-    // we use A&S 13.3.7 formula when sign(z) != sign(a),
-    // but after Kummer's tranformation z is always greather than zero;
-    if ((boost::math::sign(a) != boost::math::sign(z + 1)) && (b != (2 * a)))
+    if (detail::hypergeometric_1f1_is_a_small_enough(a) && ((fabs(b) < fabs(a)) || (fabs(a) < fabs(z))))
     {
-      const bool would_sqrt_have_been_nan = (2 * (z  * (b - (2 * a)))) < 0;
-      // check for correct parameters for Bessel function inside asym series
-      if ((!would_sqrt_have_been_nan) && (a < -10)) // TODO 13_3_7: fabs(a) seriously depends on fabs(z)
+      // TODO: this part has to be researched deeper
+      if (a == ceil(a))
+        return detail::hypergeometric_1f1_backward_recurrence_for_negative_a(a, b, z, pol);
+      else
         return detail::hypergeometric_1f1_13_3_7_series(a, b, z, pol);
-
-      // we calculate numerator and denominator of Taylor series separately
-      // when -10 < a < 0
-      if (a < 0)
-        return detail::hypergeometric_1f1_separated_series(a, b, z, pol);
     }
 
     return detail::hypergeometric_1f1_generic_series(a, b, z, pol);
