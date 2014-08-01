@@ -16,10 +16,9 @@
   // Luke: C ---------- SUBROUTINE R1F1P(CP, Z, A, B, N) ----------
   // Luke: C ----- PADE APPROXIMATION OF 1F1( 1 ; CP ; -Z ) -------
   template <class T, class Policy>
-  inline T hypergeometric_1f1_pade(const T& cp, const T& zp, const unsigned n, const Policy& pol)
+  inline T hypergeometric_1f1_pade(const T& cp, const T& zp, const Policy& pol)
   {
     BOOST_MATH_STD_USING
-    BOOST_ASSERT(n >= 2);
 
     static const T one = T(1);
 
@@ -35,8 +34,12 @@
     T b1 = one + (z / ct1);
     T a1 = b1 - (z / cp);
 
+    const unsigned max_iterations = boost::math::policies::get_max_series_iterations<Policy>();
+
     T b2 = T(0), a2 = T(0);
-    for (unsigned k = 1; k < n; ++k)
+    T result = T(0), prev_result = a1 / b1;
+
+    for (unsigned k = 1; k < max_iterations; ++k)
     {
       // Luke: C ----- CALCULATION OF THE MULTIPLIERS -----
       // Luke: C ----------- FOR THE RECURSION ------------
@@ -48,6 +51,14 @@
       // Luke: C ------------ ARE AS FOLLOWS --------------
       b2 = (g1 * b1) + (g2 * b0);
       a2 = (g1 * a1) + (g2 * a0);
+
+      prev_result = result;
+      result = a2 / b2;
+
+      // condition for interruption
+      if ((fabs(result) * boost::math::tools::epsilon<T>()) > fabs(result - prev_result))
+        break;
+
       b0 = b1; b1 = b2;
       a0 = a1; a1 = a2;
 
@@ -61,10 +72,9 @@
   // Luke: C -------- SUBROUTINE R2F1P(BP, CP, Z, A, B, N) --------
   // Luke: C ---- PADE APPROXIMATION OF 2F1( 1 , BP; CP ; -Z ) ----
   template <class T, class Policy>
-  inline T hypergeometric_2f1_pade(const T& bp, const T& cp, const T& zp, const unsigned n, const Policy& pol)
+  inline T hypergeometric_2f1_pade(const T& bp, const T& cp, const T& zp, const Policy& pol)
   {
     BOOST_MATH_STD_USING
-    BOOST_ASSERT(n >= 2);
 
     static const T one = T(1);
 
@@ -80,8 +90,12 @@
     T b1 = one + ((z / (cp + one)) * (bp + one));
     T a1 = b1 - ((bp / cp) * z);
 
+    const unsigned max_iterations = boost::math::policies::get_max_series_iterations<Policy>();
+
     T b2 = T(0), a2 = T(0);
-    for (unsigned k = 1; k < n; ++k)
+    T result = T(0), prev_result = a1 / b1;
+
+    for (unsigned k = 1; k < max_iterations; ++k)
     {
       // Luke: C ----- CALCULATION OF THE MULTIPLIERS -----
       // Luke: C ----------- FOR THE RECURSION ------------
@@ -95,6 +109,14 @@
       // Luke: C ------------ ARE AS FOLLOWS --------------
       b2 = (g1 * b1) + (g2 * b0);
       a2 = (g1 * a1) + (g2 * a0);
+
+      prev_result = result;
+      result = a2 / b2;
+
+      // condition for interruption
+      if ((fabs(result) * boost::math::tools::epsilon<T>()) > fabs(result - prev_result))
+        break;
+
       b0 = b1; b1 = b2;
       a0 = a1; a1 = a2;
 

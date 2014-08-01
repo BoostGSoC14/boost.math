@@ -22,6 +22,7 @@
   #include <boost/math/special_functions/detail/hypergeometric_0f1_bessel.hpp>
   #include <boost/math/special_functions/detail/hypergeometric_1f1_bessel.hpp>
   #include <boost/math/special_functions/detail/hypergeometric_1f1_recurrence.hpp>
+  #include <boost/math/special_functions/detail/hypergeometric_pade.hpp>
   #include <boost/math/special_functions/detail/hypergeometric_asym.hpp>
 
   namespace boost { namespace math { namespace detail {
@@ -128,11 +129,16 @@
       }
     }
 
-    // Let's make z positive (almost always)
-    // by Kummer's transformation
-    // (we also don't transform if z belongs to [-1,0])
     if (z < -1)
+    {
+      if (a == 1)
+        return detail::hypergeometric_1f1_pade(b, z, pol);
+
+      // Let's otherwise make z positive (almost always)
+      // by Kummer's transformation
+      // (we also don't transform if z belongs to [-1,0])
       return exp(z) * detail::hypergeometric_1f1_imp<T>(b_minus_a, b, -z, pol);
+    }
 
     if (detail::hypergeometric_1f1_is_a_small_enough(a) && ((fabs(b) < fabs(a)) || (fabs(a) < fabs(z))))
     {
