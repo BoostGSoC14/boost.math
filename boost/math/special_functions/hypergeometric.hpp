@@ -106,8 +106,14 @@
     if (b_minus_a == 0)
       return exp(z);
 
-    if ((b_minus_a == -1) && ((a > 0) && (a != floor(a)))) // revise for negative a and b; probably && ((a > 0) && (a != floor(a))
+    if ((b_minus_a == -1))
+    {
+      // for negative integer a and b is reasonable to use truncated series - polynomial
+      if ((a < 0) && (a == ceil(a)))
+        return detail::hypergeometric_1f1_generic_series(a, b, z, pol);
+
       return (1 + (z / b)) * exp(z);
+    }
 
     if ((a == 1) && (b == 2))
       return (exp(z) - 1) / z;
