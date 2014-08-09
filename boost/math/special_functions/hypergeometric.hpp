@@ -16,6 +16,7 @@
   #include <boost/math/policies/error_handling.hpp>
 
   #include <boost/math/special_functions/laguerre.hpp>
+  #include <boost/math/special_functions/gamma.hpp>
 
   #include <boost/math/special_functions/detail/hypergeometric_series.hpp>
   #include <boost/math/special_functions/detail/hypergeometric_separated_series.hpp>
@@ -23,6 +24,7 @@
   #include <boost/math/special_functions/detail/hypergeometric_1f1_bessel.hpp>
   #include <boost/math/special_functions/detail/hypergeometric_1f1_recurrence.hpp>
   #include <boost/math/special_functions/detail/hypergeometric_pade.hpp>
+  #include <boost/math/special_functions/detail/hypergeometric_rational.hpp>
   #include <boost/math/special_functions/detail/hypergeometric_asym.hpp>
 
   namespace boost { namespace math { namespace detail {
@@ -135,6 +137,9 @@
       }
     }
 
+    if (fabs(b) >= fabs(100 * z)) // TODO: extend to multuiprecision
+      return detail::hypergeometric_1f1_rational(a, b, z, pol);
+
     if (z < -1)
     {
       if (a == 1)
@@ -146,13 +151,16 @@
       return exp(z) * detail::hypergeometric_1f1_imp<T>(b_minus_a, b, -z, pol);
     }
 
-    if (detail::hypergeometric_1f1_is_a_small_enough(a) && ((fabs(b) < fabs(a)) || (fabs(a) < fabs(z))))
+    if (detail::hypergeometric_1f1_is_a_small_enough(a))
     {
       // TODO: this part has to be researched deeper
-      if (a == ceil(a))
+      const bool b_is_negative_and_greater_than_z = b < 0 ? (fabs(b) > fabs(z) ? 1 : 0) : 0;
+      if ((a == ceil(a)) && !b_is_negative_and_greater_than_z)
         return detail::hypergeometric_1f1_backward_recurrence_for_negative_a(a, b, z, pol);
-      else
+      else if ((2 * (z  * (b - (2 * a)))) > 0) // TODO: see when this methd is bad in opposite to usual taylor
         return detail::hypergeometric_1f1_13_3_7_series(a, b, z, pol);
+      else if (b < a)
+        return detail::hypergeometric_1f1_backward_recurrence_for_negative_b(a, b, z, pol);
     }
 
     return detail::hypergeometric_1f1_generic_series(a, b, z, pol);
