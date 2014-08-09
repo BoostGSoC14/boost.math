@@ -60,16 +60,49 @@ void expected_results()
       ".*",                 // stdlib
       ".*",                 // platform
       "double",             // test type(s)
+      ".*rational.*",       // test data group
+      ".*", 15, 2);         // test function
+
+  add_expected_result(
+      ".*",                 // compiler
+      ".*",                 // stdlib
+      ".*",                 // platform
+      "double",             // test type(s)
+      ".*pade.*",           // test data group
+      ".*", 30, 3);         // test function
+
+  add_expected_result(
+      ".*",                 // compiler
+      ".*",                 // stdlib
+      ".*",                 // platform
+      "double",             // test type(s)
       ".*",                 // test data group
-      ".*", 10, 5);          // test function
+      ".*", 10, 2);         // test function
 
   add_expected_result(
       ".*",                 // compiler
       ".*",                 // stdlib
       ".*",                 // platform
       largest_type,         // test type(s)
+      ".*rational.*",       // test data group
+      ".*", 26000, 2000);   // test function
+
+  add_expected_result(
+      ".*",                 // compiler
+      ".*",                 // stdlib
+      ".*",                 // platform
+      largest_type,         // test type(s)
+      ".*pade.*",           // test data group
+      ".*", 60000, 5000);   // test function
+
+  // worst case in choice of 13.3.7 and backward recurrence
+  add_expected_result(
+      ".*",                 // compiler
+      ".*",                 // stdlib
+      ".*",                 // platform
+      largest_type,         // test type(s)
       ".*",                 // test data group
-      ".*", 200, 50);          // test function
+      ".*", 4000, 600);     // test function
   //
   // Finish off by printing out the compiler/stdlib/platform names,
   // we do this to make it easier to mark up expected error rates.

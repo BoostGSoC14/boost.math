@@ -81,8 +81,8 @@ void do_test_hypergeometric_1f1_int(const T& data, const char* type_name, const 
   // test hypergeometric_1f1 against data:
   //
   result = boost::math::tools::test_hetero<Real>(
-    data, 
-    bind_func<Real>(funcp, 0, 1), 
+    data,
+    bind_func<Real>(funcp, 0, 1),
     extract_result<Real>(2));
   handle_test_result(result, data[result.worst()], result.worst(), type_name, "boost::math::hypergeometric_1f1", test_name);
   std::cout << std::endl;
@@ -131,5 +131,12 @@ void test_hypergeometric(T, const char* name)
   }};
 
   do_test_hypergeometric_1f1<T>(pearson_1f1_data, name, "John Pearson dissertation: WolframAlpha Data");
+
+#include "hypergeometric_1f1_luke_rational_data.ipp"
+  do_test_hypergeometric_1f1<T>(hypergeometric_1f1_luke_rational_data, name, "Random positive data with b >= (10 * a) (rational case)");
+#include "hypergeometric_1f1_luke_pade_moderate_data.ipp"
+  do_test_hypergeometric_1f1<T>(hypergeometric_1f1_luke_pade_moderate_data, name, "Random data with a == 1 (pade case)");
+#include "hypergeometric_1f1_moderate_data.ipp"
+  do_test_hypergeometric_1f1<T>(hypergeometric_1f1_moderate_data, name, "Random moderate data");
 }
 
