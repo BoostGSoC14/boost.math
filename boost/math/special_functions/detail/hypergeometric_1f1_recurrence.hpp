@@ -11,123 +11,103 @@
 #ifndef BOOST_HYPERGEOMETRIC_1F1_RECURRENCE_HPP_
   #define BOOST_HYPERGEOMETRIC_1F1_RECURRENCE_HPP_
 
-  #include <deque>
-
   #include <boost/math/special_functions/modf.hpp>
   #include <boost/math/special_functions/next.hpp>
+
+  #include <boost/math/tools/tuple.hpp>
 
   namespace boost { namespace math { namespace detail {
 
   template <class T>
-  struct hypergeometric_1f1_backward_recurrence_a_next_coefficients
+  struct hypergeometric_1f1_recurrence_a_coefficients
   {
-    typedef std::pair<T, T> result_type;
+    typedef boost::math::tuple<T, T, T> result_type;
 
-    hypergeometric_1f1_backward_recurrence_a_next_coefficients(const T& a, const T& b, const T& z):
-      b(b), z(z), a(a)
+    hypergeometric_1f1_recurrence_a_coefficients(const T& a, const T& b, const T& z):
+    a(a), b(b), z(z)
     {
     }
 
-    result_type operator()()
+    result_type operator()(boost::intmax_t i) const
     {
-      const result_type result = std::make_pair<T, T>((a - b) / a, (((2 * a) - b) + z) / a);
-      --a;
-      return result;
+      const T ai = a + i;
+
+      const T an = -ai;
+      const T bn = (b - (2 * ai)) - z;
+      const T cn = b - ai;
+
+      return boost::math::make_tuple(an, bn, cn);
     }
 
   private:
-    const T b, z;
-    T a;
+    const T a, b, z;
   };
 
   template <class T>
-  struct hypergeometric_1f1_forward_recurrence_a_next_coefficients
+  struct hypergeometric_1f1_recurrence_b_coefficients
   {
-    typedef std::pair<T, T> result_type;
+    typedef boost::math::tuple<T, T, T> result_type;
 
-    hypergeometric_1f1_forward_recurrence_a_next_coefficients(const T& a, const T& b, const T& z):
-      b(b), z(z), a(a)
+    hypergeometric_1f1_recurrence_b_coefficients(const T& a, const T& b, const T& z):
+    a(a), b(b), z(z)
     {
     }
 
-    result_type operator()()
+    result_type operator()(boost::intmax_t i) const
     {
-      const T cn = a - b; 
-      const result_type result = std::make_pair<T, T>(a / cn, (((2 * a) - b) + z) / cn);
-      ++a;
-      return result;
+      const T bi = b + i;
+
+      const T an = z * (bi - a);
+      const T bn = bi * ((z + bi) - 1);
+      const T cn = bi * (bi - 1);
+
+      return boost::math::make_tuple(an, bn, cn);
     }
 
   private:
-    const T b, z;
-    T a;
+    const T a, b, z;
   };
 
   template <class T>
-  struct hypergeometric_1f1_backward_recurrence_b_next_coefficients
+  struct hypergeometric_1f1_recurrence_a_and_b_coefficients
   {
-    typedef std::pair<T, T> result_type;
+    typedef boost::math::tuple<T, T, T> result_type;
 
-    hypergeometric_1f1_backward_recurrence_b_next_coefficients(const T& a, const T& b, const T& z):
-      a(a), z(z), b(b)
+    hypergeometric_1f1_recurrence_a_and_b_coefficients(const T& a, const T& b, const T& z):
+    a(a), b(b), z(z)
     {
     }
 
-    result_type operator()()
+    result_type operator()(boost::intmax_t i) const
     {
-      const T cn = z * (b - a);
-      const result_type result = std::make_pair<T, T>((b * (b - 1)) / cn, (b * ((b - 1) + z)) / cn);
-      --b;
-      return result;
+      const T ai = a + i;
+      const T bi = b + i;
+
+      const T an = ai * z;
+      const T bn = bi * ((1 - bi) + z);
+      const T cn = bi * (1 - bi);
+
+      return boost::math::make_tuple(an, bn, cn);
     }
 
   private:
-    const T a, z;
-    T b;
-  };
-
-  template <class T>
-  struct hypergeometric_1f1_backward_recurrence_a_and_b_next_coefficients
-  {
-    typedef std::pair<T, T> result_type;
-
-    hypergeometric_1f1_backward_recurrence_a_and_b_next_coefficients(const T& a, const T& b, const T& z):
-      z(z), a(a), b(b)
-    {
-    }
-
-    result_type operator()()
-    {
-      const T cn = a * z;
-      const result_type result = std::make_pair<T, T>((b * (1 - b)) / cn, (b * ((1 - b) + z)) / cn);
-      --a; --b;
-      return result;
-    }
-
-  private:
-    const T z;
-    T a, b;
+    const T a, b, z;
   };
 
   template <class T, class NextCoefs>
-  inline T hypergeometric_1f1_recurrence(NextCoefs& get_coefs, boost::uintmax_t last_index, T& first, T& second, std::deque<T>* hyp_results = 0)
+  inline T hypergeometric_1f1_recurrence_forward(NextCoefs& get_coefs, boost::intmax_t last_index, T& first, T& second)
   {
     using std::swap;
+    using boost::math::tuple;
+    using boost::math::get;
 
     T third = 0;
 
-    if (hyp_results)
+    for (boost::intmax_t k = 0; k < last_index; ++k)
     {
-      hyp_results->clear();
-      hyp_results->resize(last_index);
-    }
+      tuple<T, T, T> next = get_coefs(k);
 
-    for (boost::uintmax_t k = 0; k < last_index; ++k)
-    {
-      std::pair<T, T> next = get_coefs();
-
-      third = ((next.second * second) - first) / next.first;
-      if (hyp_results) hyp_results->push_back(third);
+      third = ((get<1>(next) * second) - (get<2>(next) * first)) / get<0>(next);
 
       swap(first, second);
       swap(second, third);
@@ -136,7 +116,29 @@
     return first;
   }
 
-  // forward declaration
+  template <class T, class NextCoefs>
+  inline T hypergeometric_1f1_recurrence_backward(NextCoefs& get_coefs, boost::intmax_t last_index, T& first, T& second)
+  {
+    using std::swap;
+    using boost::math::tuple;
+    using boost::math::get;
+
+    T third = 0;
+
+    for (boost::intmax_t k = 0; k > last_index; --k)
+    {
+      tuple<T, T, T> next = get_coefs(k);
+
+      third = ((get<1>(next) * second) - (get<0>(next) * first)) / get<2>(next);
+
+      swap(first, second);
+      swap(second, third);
+    }
+
+    return first;
+  }
+
+  // forward declaration for initial values
   template <class T, class Policy>
   inline T hypergeometric_1f1_imp(const T& a, const T& b, const T& z, const Policy& pol);
 
@@ -155,20 +157,19 @@
     const bool are_fractional_parts_close_enough =
       fabs(boost::math::float_distance(ak, bk)) <= pow(2, ((std::max)(exp_of_a, exp_of_b)));
 
-    if ((a < b) && (b < 0) && (are_fractional_parts_close_enough)) // TODO: to be researched in detail
+    if ((a < b) && (b < 0) && (are_fractional_parts_close_enough)) // TODO: has to be researched deeper
     {
       ak = b - 1;
       integer_part -= ceil(b) - 1;
     }
-    
+
     T first = detail::hypergeometric_1f1_imp(ak, b, z, pol);
     --ak;
     T second = detail::hypergeometric_1f1_imp(ak, b, z, pol);
 
-    const boost::uintmax_t last_index = fabs(integer_part);
-    detail::hypergeometric_1f1_backward_recurrence_a_next_coefficients<T> s(ak, b, z);
+    detail::hypergeometric_1f1_recurrence_a_coefficients<T> s(ak, b, z);
 
-    return detail::hypergeometric_1f1_recurrence(s, last_index, first, second);
+    return detail::hypergeometric_1f1_recurrence_backward(s, integer_part, first, second);
   }
 
   template <class T, class Policy>
@@ -183,10 +184,9 @@
     ++ak;
     T second = detail::hypergeometric_1f1_imp(ak, b, z, pol);
 
-    const boost::uintmax_t last_index = fabs(integer_part);
-    detail::hypergeometric_1f1_forward_recurrence_a_next_coefficients<T> s(ak, b, z);
+    detail::hypergeometric_1f1_recurrence_a_coefficients<T> s(ak, b, z);
 
-    return detail::hypergeometric_1f1_recurrence(s, last_index, first, second);
+    return detail::hypergeometric_1f1_recurrence_forward(s, integer_part, first, second);
   }
 
   template <class T, class Policy>
@@ -201,10 +201,9 @@
     --bk;
     T second = detail::hypergeometric_1f1_imp(a, bk, z, pol);
 
-    const boost::uintmax_t last_index = fabs(integer_part);
-    detail::hypergeometric_1f1_backward_recurrence_b_next_coefficients<T> s(a, bk, z);
+    detail::hypergeometric_1f1_recurrence_b_coefficients<T> s(a, bk, z);
 
-    return detail::hypergeometric_1f1_recurrence(s, last_index, first, second);
+    return detail::hypergeometric_1f1_recurrence_backward(s, integer_part, first, second);
   }
 
   // this method works provided that integer part of a is the same as integer part of b
@@ -222,17 +221,16 @@
     --ak; --bk;
     T second = detail::hypergeometric_1f1_imp(ak, bk, z, pol);
 
-    const boost::uintmax_t last_index = fabs(integer_part);
-    detail::hypergeometric_1f1_backward_recurrence_a_and_b_next_coefficients<T> s(ak, bk, z);
+    detail::hypergeometric_1f1_recurrence_a_and_b_coefficients<T> s(ak, bk, z);
 
-    return detail::hypergeometric_1f1_recurrence(s, last_index, first, second);
+    return detail::hypergeometric_1f1_recurrence_backward(s, integer_part, first, second);
   }
 
   // ranges
   template <class T>
   inline bool hypergeometric_1f1_is_a_small_enough(const T& a)
   {
-    return a < -50; // TODO: make dependent on precision
+    return a < -10; // TODO: make dependent on precision
   }
 
   } } } // namespaces
