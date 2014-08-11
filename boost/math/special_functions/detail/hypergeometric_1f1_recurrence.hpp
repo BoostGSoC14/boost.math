@@ -14,7 +14,7 @@
   #include <boost/math/special_functions/modf.hpp>
   #include <boost/math/special_functions/next.hpp>
 
-  #include <boost/math/tools/tuple.hpp>
+  #include <boost/math/tools/recurrence.hpp>
 
   namespace boost { namespace math { namespace detail {
 
@@ -94,50 +94,6 @@
     const T a, b, z;
   };
 
-  template <class T, class NextCoefs>
-  inline T hypergeometric_1f1_recurrence_forward(NextCoefs& get_coefs, boost::intmax_t last_index, T& first, T& second)
-  {
-    using std::swap;
-    using boost::math::tuple;
-    using boost::math::get;
-
-    T third = 0;
-
-    for (boost::intmax_t k = 0; k < last_index; ++k)
-    {
-      tuple<T, T, T> next = get_coefs(k);
-
-      third = ((get<1>(next) * second) - (get<2>(next) * first)) / get<0>(next);
-
-      swap(first, second);
-      swap(second, third);
-    }
-
-    return first;
-  }
-
-  template <class T, class NextCoefs>
-  inline T hypergeometric_1f1_recurrence_backward(NextCoefs& get_coefs, boost::intmax_t last_index, T& first, T& second)
-  {
-    using std::swap;
-    using boost::math::tuple;
-    using boost::math::get;
-
-    T third = 0;
-
-    for (boost::intmax_t k = 0; k > last_index; --k)
-    {
-      tuple<T, T, T> next = get_coefs(k);
-
-      third = ((get<1>(next) * second) - (get<0>(next) * first)) / get<2>(next);
-
-      swap(first, second);
-      swap(second, third);
-    }
-
-    return first;
-  }
-
   // forward declaration for initial values
   template <class T, class Policy>
   inline T hypergeometric_1f1_imp(const T& a, const T& b, const T& z, const Policy& pol);
@@ -169,7 +125,7 @@
 
     detail::hypergeometric_1f1_recurrence_a_coefficients<T> s(ak, b, z);
 
-    return detail::hypergeometric_1f1_recurrence_backward(s, integer_part, first, second);
+    return tools::solve_recurrence_relation_backward(s, integer_part, first, second);
   }
 
   template <class T, class Policy>
@@ -186,7 +142,7 @@
 
     detail::hypergeometric_1f1_recurrence_a_coefficients<T> s(ak, b, z);
 
-    return detail::hypergeometric_1f1_recurrence_forward(s, integer_part, first, second);
+    return tools::solve_recurrence_relation_forward(s, integer_part, first, second);
   }
 
   template <class T, class Policy>
@@ -203,7 +159,7 @@
 
     detail::hypergeometric_1f1_recurrence_b_coefficients<T> s(a, bk, z);
 
-    return detail::hypergeometric_1f1_recurrence_backward(s, integer_part, first, second);
+    return tools::solve_recurrence_relation_backward(s, integer_part, first, second);
   }
 
   // this method works provided that integer part of a is the same as integer part of b
@@ -223,7 +179,7 @@
 
     detail::hypergeometric_1f1_recurrence_a_and_b_coefficients<T> s(ak, bk, z);
 
-    return detail::hypergeometric_1f1_recurrence_backward(s, integer_part, first, second);
+    return tools::solve_recurrence_relation_backward(s, integer_part, first, second);
   }
 
   // ranges
