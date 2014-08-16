@@ -208,7 +208,7 @@
   // second: w(1);
   //
   template <class T, class NextCoefs>
-  inline T solve_recurrence_relation_forward(NextCoefs& get_coefs, boost::intmax_t last_index, T first, T second)
+  inline T solve_recurrence_relation_forward(NextCoefs& get_coefs, unsigned last_index, T first, T second)
   {
     using std::swap;
     using boost::math::tuple;
@@ -216,7 +216,7 @@
 
     T third = 0;
 
-    for (boost::intmax_t k = 0; k < last_index; ++k)
+    for (unsigned k = 0; k < last_index; ++k)
     {
       tuple<T, T, T> next = get_coefs(k);
 
@@ -241,7 +241,7 @@
   // second: w(1);
   //
   template <class T, class NextCoefs>
-  inline T solve_recurrence_relation_backward(NextCoefs& get_coefs, boost::intmax_t last_index, T first, T second)
+  inline T solve_recurrence_relation_backward(NextCoefs& get_coefs, unsigned last_index, T first, T second)
   {
     using std::swap;
     using boost::math::tuple;
@@ -249,9 +249,9 @@
 
     T third = 0;
 
-    for (boost::intmax_t k = 0; k > last_index; --k)
+    for (unsigned k = 0; k < last_index; ++k)
     {
-      tuple<T, T, T> next = get_coefs(k);
+      tuple<T, T, T> next = get_coefs(static_cast<int>(-k));
 
       third = ((get<1>(next) * second) - (get<0>(next) * first)) / get<2>(next);
 
