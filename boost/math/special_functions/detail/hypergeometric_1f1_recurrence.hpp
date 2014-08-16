@@ -125,7 +125,7 @@
 
     detail::hypergeometric_1f1_recurrence_a_coefficients<T> s(ak, b, z);
 
-    return tools::solve_recurrence_relation_backward(s, integer_part, first, second);
+    return tools::solve_recurrence_relation_backward(s, fabs(integer_part), first, second);
   }
 
   template <class T, class Policy>
@@ -159,7 +159,7 @@
 
     detail::hypergeometric_1f1_recurrence_b_coefficients<T> s(a, bk, z);
 
-    return tools::solve_recurrence_relation_backward(s, integer_part, first, second);
+    return tools::solve_recurrence_relation_backward(s, fabs(integer_part), first, second);
   }
 
   // this method works provided that integer part of a is the same as integer part of b
@@ -179,7 +179,7 @@
 
     detail::hypergeometric_1f1_recurrence_a_and_b_coefficients<T> s(ak, bk, z);
 
-    return tools::solve_recurrence_relation_backward(s, integer_part, first, second);
+    return tools::solve_recurrence_relation_backward(s, fabs(integer_part), first, second);
   }
 
   // ranges
