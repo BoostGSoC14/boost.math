@@ -251,7 +251,7 @@
 
     for (unsigned k = 0; k < last_index; ++k)
     {
-      tuple<T, T, T> next = get_coefs(static_cast<int>(-k));
+      tuple<T, T, T> next = get_coefs(-static_cast<int>(k));
 
       third = ((get<1>(next) * second) - (get<0>(next) * first)) / get<2>(next);
 

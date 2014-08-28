@@ -69,8 +69,16 @@
   {
     BOOST_MATH_STD_USING
 
-    if (fabs(z) > 100 && (std::max)(T(1), T(fabs(b - a))) * (std::max)(T(1), T(fabs(1 - a))) < 0.5 * fabs(z)) // TODO: not a good way
+    const T the_max_of_one_and_b_minus_a  ((std::max)(T(1), fabs(b - a)));
+    const T the_max_of_one_and_one_minus_a((std::max)(T(1), fabs(1 - a)));
+
+    const T the_product_of_these_maxima(the_max_of_one_and_b_minus_a * the_max_of_one_and_one_minus_a);
+
+    const T abs_of_z(fabs(z));
+
+    if ((abs_of_z > 100) && (the_product_of_these_maxima < (abs_of_z / 2))) // TODO: not a good way
       return true;
+
     return false;
   }
 

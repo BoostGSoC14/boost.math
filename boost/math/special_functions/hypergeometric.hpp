@@ -199,6 +199,7 @@
   inline T hypergeometric_2f0_imp(const T& a1, const T& a2, const T& z, const Policy& pol)
   {
     BOOST_MATH_STD_USING
+
     static const char* const function = "boost::math::hypergeometric_2f0<%1%,%1%,%1%>(%1%,%1%,%1%)";
 
     const bool is_a1_integer = (a1 == floor(a1));
@@ -208,8 +209,8 @@
     {
       if ((a1 < 1) && (a2 <= a1))
       {
-        const unsigned int n = static_cast<unsigned int>(static_cast<boost::uintmax_t>(static_cast<T>(-a1)));
-        const unsigned int m = static_cast<unsigned int>(static_cast<boost::uintmax_t>(static_cast<T>(-a2 - n)));
+        const unsigned int n = static_cast<unsigned int>(static_cast<boost::uintmax_t>(boost::math::lltrunc(-a1)));
+        const unsigned int m = static_cast<unsigned int>(static_cast<boost::uintmax_t>(boost::math::lltrunc(-a2 - n)));
 
         return (pow(z, n) * boost::math::factorial<T>(n, pol)) *
           boost::math::laguerre(n, m, -(1 / z), pol);

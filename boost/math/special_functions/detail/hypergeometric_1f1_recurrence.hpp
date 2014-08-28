@@ -111,12 +111,12 @@
     int exp_of_b = 0; frexp(b, &exp_of_b);
 
     const bool are_fractional_parts_close_enough =
-      fabs(boost::math::float_distance(ak, bk)) <= pow(2, ((std::max)(exp_of_a, exp_of_b)));
+      fabs(boost::math::float_distance(ak, bk)) <= pow(2, (std::max)(exp_of_a, exp_of_b));
 
     if ((a < b) && (b < 0) && (are_fractional_parts_close_enough)) // TODO: has to be researched deeper
     {
       ak = b - 1;
-      integer_part -= ceil(b) - 1;
+      integer_part -= (boost::math::lltrunc(ceil(b)) - 1);
     }
 
     T first = detail::hypergeometric_1f1_imp(ak, b, z, pol);
@@ -125,7 +125,10 @@
 
     detail::hypergeometric_1f1_recurrence_a_coefficients<T> s(ak, b, z);
 
-    return tools::solve_recurrence_relation_backward(s, fabs(integer_part), first, second);
+    return tools::solve_recurrence_relation_backward(s,
+                                                     static_cast<unsigned int>(std::abs(integer_part)),
+                                                     first,
+                                                     second);
   }
 
   template <class T, class Policy>
@@ -159,7 +162,10 @@
 
     detail::hypergeometric_1f1_recurrence_b_coefficients<T> s(a, bk, z);
 
-    return tools::solve_recurrence_relation_backward(s, fabs(integer_part), first, second);
+    return tools::solve_recurrence_relation_backward(s,
+                                                     static_cast<unsigned int>(std::abs(integer_part)),
+                                                     first,
+                                                     second);
   }
 
   // this method works provided that integer part of a is the same as integer part of b
