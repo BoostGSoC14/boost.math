@@ -33,10 +33,23 @@
 
     BOOST_ASSERT(!(is_a_integer && a <= 0) && !(is_b_integer && b <= 0));
 
-    const T gamma_ratio = (b > 0 && a > 0) ?
-      boost::math::tgamma_ratio(b, a, pol) :
-      T(boost::math::tgamma(b, pol) / boost::math::tgamma(a, pol));
-    const T prefix_a = (exp(z) * gamma_ratio) * pow(z, (a - b));
+    T prefix_a;
+    if((fabs(a) > boost::math::max_factorial<T>::value) || (fabs(b) > boost::math::max_factorial<T>::value) || (z > boost::math::tools::log_max_value<T>()))
+    {
+       int s1, s2;
+       prefix_a = boost::math::lgamma(b, &s1, pol) - boost::math::lgamma(a, &s2, pol) + z + (a - b) * log(z);
+       prefix_a = exp(prefix_a);
+       prefix_a *= s1 * s2;
+    }
+    else
+    {
+       const T gamma_ratio = (b > 0 && a > 0) ?
+          boost::math::tgamma_ratio(b, a, pol) :
+          T(boost::math::tgamma(b, pol) / boost::math::tgamma(a, pol));
+       const T e = exp(z);
+       const T p = pow(z, (a - b));
+       prefix_a = p < 1 ? e * (gamma_ratio * p) : (e * gamma_ratio) * p;
+    }
 
     return prefix_a * boost::math::hypergeometric_2f0(b - a, 1 - a, 1 / z, pol);
   }
@@ -69,8 +82,8 @@
   {
     BOOST_MATH_STD_USING
 
-    const T the_max_of_one_and_b_minus_a  ((std::max)(T(1), fabs(b - a)));
-    const T the_max_of_one_and_one_minus_a((std::max)(T(1), fabs(1 - a)));
+    const T the_max_of_one_and_b_minus_a  ((std::max)(T(1), T(fabs(b - a))));
+    const T the_max_of_one_and_one_minus_a((std::max)(T(1), T(fabs(1 - a))));
 
     const T the_product_of_these_maxima(the_max_of_one_and_b_minus_a * the_max_of_one_and_one_minus_a);
 
