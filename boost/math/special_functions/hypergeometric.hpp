@@ -87,9 +87,6 @@
 
     static const char* const function = "boost::math::hypergeometric_1f1<%1%,%1%,%1%>(%1%,%1%,%1%)";
 
-    if ((z == 0) || (a == 0))
-      return T(1);
-
     // undefined result:
     if (!detail::check_hypergeometric_1f1_parameters(a, b))
       return policies::raise_domain_error<T>(
@@ -97,6 +94,9 @@
         "Function is indeterminate for negative integer b = %1%.",
         b,
         pol);
+
+    if ((z == 0) || (a == 0))
+      return T(1);
 
     // other checks:
     if (a == -1)
@@ -142,6 +142,8 @@
 
     if (z < -1)
     {
+      if(b_minus_a == b)
+        return 1;
       if (a == 1)
         return detail::hypergeometric_1f1_pade(b, z, pol);
 
@@ -151,16 +153,61 @@
       return exp(z) * detail::hypergeometric_1f1_imp<T>(b_minus_a, b, -z, pol);
     }
 
+    //
+    // If the series has all positive terms, then we might as well
+    // use it, even if it's initially divergent (and may shoot off
+    // to infinity).  However, we must ensure that if some arguments
+    // are negative, that the series is converging before it starts
+    // alternating:
+    //
+    if(a * b * z > 0)
+    {
+       if(a < 0)
+       {
+          if(z < 0)
+          {
+             // a < 0, z < 0
+             if(-z < -a * (b - a))
+                return detail::hypergeometric_1f1_generic_series(a, b, z, pol);
+          }
+          else
+          {
+             // a < 0, b < 0
+             if(a > b)
+             {
+                // a changes sign first, this leads to a false convergence in the series, so skip this branch...
+                //if(z < -a * (-b - a))
+                  //return detail::hypergeometric_1f1_generic_series(a, b, z, pol);
+             }
+             else
+             {
+                // b changes sign first:
+                if((-a + b) * z < -b)
+                   return detail::hypergeometric_1f1_generic_series(a, b, z, pol);
+             }
+          }
+       }
+       else if(b < 0)
+       {
+          // b < 0, z < 0
+          if((a - b) * z < -b)
+             return detail::hypergeometric_1f1_generic_series(a, b, z, pol);
+       }
+       else
+          // All positive:
+          return detail::hypergeometric_1f1_generic_series(a, b, z, pol);
+    }
+
     if (detail::hypergeometric_1f1_is_a_small_enough(a))
     {
       // TODO: this part has to be researched deeper
       const bool b_is_negative_and_greater_than_z = b < 0 ? (fabs(b) > fabs(z) ? 1 : 0) : 0;
       if ((a == ceil(a)) && !b_is_negative_and_greater_than_z)
         return detail::hypergeometric_1f1_backward_recurrence_for_negative_a(a, b, z, pol);
-      else if ((2 * (z  * (b - (2 * a)))) > 0) // TODO: see when this methd is bad in opposite to usual taylor
-        return detail::hypergeometric_1f1_13_3_7_series(a, b, z, pol);
       else if (b < a)
         return detail::hypergeometric_1f1_backward_recurrence_for_negative_b(a, b, z, pol);
+      else if ((2 * (z  * (b - (2 * a)))) > 0) // TODO: see when this methd is bad in opposite to usual taylor
+        return detail::hypergeometric_1f1_13_3_7_series(a, b, z, pol);
     }
 
     return detail::hypergeometric_1f1_generic_series(a, b, z, pol);
